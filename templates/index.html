@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>F9UM SERVICES | OSINT Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains-Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -422,7 +422,7 @@
 
         .field-box {
             background: rgba(255, 255, 255, 0.02);
-            padding: 10px 14px;
+            padding: 12px 16px;
             border-radius: 10px;
             border-left: 3px solid var(--neon-purple);
             transition: border-color 0.3s ease, background 0.3s ease;
@@ -510,7 +510,7 @@
         </div>
 
         <div class="search-card">
-            <input type="text" id="queryInput" placeholder="Ex: nom@exemple.com">
+            <input type="text" id="queryInput" placeholder="Ex: nom@exemple.com" onkeypress="if(event.key === 'Enter') lancerRecherche()">
             <button class="btn-search" onclick="lancerRecherche()">Rechercher</button>
         </div>
 
@@ -519,6 +519,7 @@
 </div>
 
 <script>
+    // EFFET TYPEWRITER BOUCLÉ
     const words = ["les enquêteurs.", "les analystes.", "la recherche de données.", "la cybersécurité."];
     let wordIndex = 0;
     let charIndex = 0;
@@ -552,6 +553,7 @@
 
     document.addEventListener("DOMContentLoaded", typeEffect);
 
+    // GESTION DES CATÉGORIES ET DE LA RECHERCHE
     let activeModule = 'email';
 
     function selectCategory(btn, moduleValue, placeholderText) {
@@ -571,11 +573,32 @@
 
         if (!query) return;
 
+        // 1. Démarrer l'animation de chargement
         area.innerHTML = `
             <div class="spinner-container">
                 <div class="spinner"></div>
             </div>
         `;
+
+        // 2. Traitement du résultat après un délai de 1.5 seconde
+        setTimeout(() => {
+            area.innerHTML = `
+                <div class="result-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--neon-cyan);">Cible : ${query}</span>
+                        <span class="badge">MODULE : ${activeModule.toUpperCase()}</span>
+                    </div>
+                    <div class="field-box">
+                        <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 5px; font-weight: 600;">
+                            Enregistrement système trouvé
+                        </p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">
+                            Données associées indexées avec succès. Prêt à être relié à une API backend.
+                        </p>
+                    </div>
+                </div>
+            `;
+        }, 1500);
     }
 </script>
 
