@@ -3,213 +3,245 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plateforme de Recherche OSINT</title>
+    <title>F9UM SERVICES - OSINT Platform</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        :root {
+            --bg-color: #0b0f19;
+            --card-bg: #111827;
+            --accent-color: #6366f1;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --border-color: #1f2937;
         }
 
         body {
-            background-color: #0f172a;
-            color: #f8fafc;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
             display: flex;
             justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
         }
 
-        .card {
-            background-color: #1e293b;
-            border: 1px solid #334155;
-            border-radius: 12px;
-            padding: 2.5rem;
+        .container {
             width: 100%;
-            max-width: 550px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            max-width: 800px;
         }
 
         h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-            color: #38bdf8;
             text-align: center;
-            letter-spacing: 0.5px;
+            color: var(--accent-color);
+            margin-bottom: 25px;
+            font-size: 2rem;
+            letter-spacing: 1px;
         }
 
-        p.subtitle {
-            font-size: 0.875rem;
-            color: #94a3b8;
-            text-align: center;
-            margin-bottom: 2rem;
+        .search-box {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
         }
 
-        .form-group {
-            margin-bottom: 1.25rem;
-        }
-
-        label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: #cbd5e1;
-        }
-
-        input[type="text"], select {
-            width: 100%;
-            padding: 0.75rem 1rem;
-            background-color: #0f172a;
-            border: 1px solid #334155;
-            border-radius: 6px;
-            color: #f8fafc;
-            font-size: 0.95rem;
+        select, input, button {
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: #1f2937;
+            color: white;
+            font-size: 14px;
             outline: none;
-            transition: border-color 0.2s ease;
         }
 
-        input[type="text"]:focus, select:focus {
-            border-color: #38bdf8;
-        }
+        select { flex: 1; }
+        input { flex: 2; }
 
         button {
-            width: 100%;
-            padding: 0.85rem;
-            background-color: #0284c7;
-            color: #ffffff;
-            font-size: 1rem;
-            font-weight: 600;
-            border: none;
-            border-radius: 6px;
+            background: var(--accent-color);
+            font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: 0.5rem;
+            transition: background 0.2s;
+            border: none;
         }
 
         button:hover {
-            background-color: #0369a1;
+            background: #4f46e5;
         }
 
-        .results-box {
-            margin-top: 1.75rem;
-            background-color: #0f172a;
-            border: 1px solid #1e293b;
+        .results-header {
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: var(--text-muted);
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .field-box {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 8px 12px;
             border-radius: 6px;
-            padding: 1rem;
-            display: none;
+            border-left: 3px solid var(--accent-color);
         }
 
-        .results-box h3 {
-            font-size: 0.9rem;
-            color: #94a3b8;
-            margin-bottom: 0.5rem;
+        .field-label {
+            font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 3px;
         }
 
-        pre {
-            white-space: pre-wrap;
+        .field-value {
+            font-size: 14px;
+            font-weight: 500;
             word-break: break-all;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.875rem;
-            color: #38bdf8;
         }
 
-        .status-loading {
-            color: #f59e0b;
+        .badge-container {
+            margin-top: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
         }
 
-        .status-error {
-            color: #ef4444;
+        .badge {
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .confidence-badge {
+            float: right;
+            background: #059669;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .loading, .empty {
+            text-align: center;
+            padding: 30px;
+            color: var(--text-muted);
         }
     </style>
 </head>
 <body>
 
-    <div class="card">
-        <h1>Outil d'Investigation OSINT</h1>
-        <p class="subtitle">Recherche ciblée sur les données publiques</p>
+<div class="container">
+    <h1>F9UM OSINT SEARCH</h1>
 
-        <div class="form-group">
-            <label for="moduleSelect">Type de recherche :</label>
-            <select id="moduleSelect" onchange="updatePlaceholder()">
-                <option value="email">Adresse E-mail</option>
-                <option value="phone">Numéro de Téléphone</option>
-                <option value="fullname">Nom & Prénom</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="queryInput">Cible :</label>
-            <input type="text" id="queryInput" placeholder="ex: exemple@gmail.com">
-        </div>
-
-        <button onclick="lancerRecherche()">Lancer la recherche</button>
-
-        <div class="results-box" id="resultsContainer">
-            <h3>Résultats de l'analyse :</h3>
-            <pre id="resultsContent"></pre>
-        </div>
+    <div class="search-box">
+        <select id="moduleSelect">
+            <option value="fullname">Nom & Prénom</option>
+            <option value="email">Adresse E-mail</option>
+            <option value="phone">Téléphone</option>
+        </select>
+        <input type="text" id="queryInput" placeholder="Ex: Jean Dupont">
+        <button onclick="lancerRecherche()">Rechercher</button>
     </div>
 
-    <script>
-        function updatePlaceholder() {
-            const module = document.getElementById('moduleSelect').value;
-            const input = document.getElementById('queryInput');
-            
-            if (module === 'email') {
-                input.placeholder = "ex: cible@gmail.com";
-            } else if (module === 'phone') {
-                input.placeholder = "ex: 0612345678 ou +33612345678";
-            } else if (module === 'fullname') {
-                input.placeholder = "ex: Jean Dupont";
-            }
-        }
+    <div id="resultsArea"></div>
+</div>
 
-        async function lancerRecherche() {
-            const query = document.getElementById('queryInput').value.trim();
-            const module = document.getElementById('moduleSelect').value;
-            const container = document.getElementById('resultsContainer');
-            const content = document.getElementById('resultsContent');
+<script>
+    async function lancerRecherche() {
+        const query = document.getElementById('queryInput').value.trim();
+        const module = document.getElementById('moduleSelect').value;
+        const area = document.getElementById('resultsArea');
 
-            if (!query) {
-                alert("Veuillez entrer une cible avant de lancer la recherche.");
+        if (!query) return;
+
+        area.innerHTML = '<div class="loading">Recherche en cours...</div>';
+
+        try {
+            const res = await fetch('/api/search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query: query, module: module })
+            });
+
+            const data = await res.json();
+            area.innerHTML = '';
+
+            const list = data?.data?.results || [];
+
+            if (list.length === 0) {
+                area.innerHTML = '<div class="empty">Aucun résultat trouvé.</div>';
                 return;
             }
 
-            container.style.display = "block";
-            content.className = "status-loading";
-            content.innerText = "Recherche en cours dans la base de données...";
+            area.innerHTML = `<div class="results-header">${list.length} profil(s) trouvé(s)</div>`;
 
-            try {
-                const response = await fetch('/api/search', {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json' 
-                    },
-                    body: JSON.stringify({ query: query, module: module })
+            list.forEach(item => {
+                let sourcesHtml = '';
+                const sources = item._sources || (item._source_db ? [item._source_db] : []);
+                sources.forEach(s => {
+                    sourcesHtml += `<span class="badge">${s}</span>`;
                 });
 
-                const data = await response.json();
+                const confHtml = item._confidence ? `<span class="confidence-badge">Score: ${item._confidence}%</span>` : '';
 
-                if (response.ok) {
-                    content.className = "";
-                    content.innerText = JSON.stringify(data, null, 2);
-                } else {
-                    content.className = "status-error";
-                    content.innerText = "Erreur : " + (data.error || "Une erreur est survenue.");
+                let fields = '';
+                const keyMap = {
+                    prenom: 'Prénom',
+                    nom_famille: 'Nom',
+                    telephone: 'Téléphone',
+                    email: 'E-mail',
+                    adresse: 'Adresse',
+                    code_postal: 'Code Postal',
+                    ville: 'Ville',
+                    nom_utilisateur: 'Identifiant / Pseudo'
+                };
+
+                for (let key in keyMap) {
+                    if (item[key]) {
+                        fields += `
+                            <div class="field-box">
+                                <div class="field-label">${keyMap[key]}</div>
+                                <div class="field-value">${item[key]}</div>
+                            </div>
+                        `;
+                    }
                 }
 
-            } catch (error) {
-                content.className = "status-error";
-                content.innerText = "Erreur de connexion avec le serveur.";
-            }
+                const card = `
+                    <div class="result-card">
+                        ${confHtml}
+                        <div class="card-grid">${fields}</div>
+                        <div class="badge-container">${sourcesHtml}</div>
+                    </div>
+                `;
+                area.innerHTML += card;
+            });
+
+        } catch (err) {
+            area.innerHTML = `<div class="empty" style="color: #ef4444;">Erreur lors de la requête : ${err.message}</div>`;
         }
-    </script>
+    }
+</script>
 
 </body>
 </html>
