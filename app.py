@@ -1,19 +1,22 @@
 import os
 import requests
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
+# URL officielle de l'API Brix Hub
 BRIX_BASE_URL = "https://api.brixhub.is/api/v1"
+
+# Récupération de la clé API depuis les variables d'environnement de Render
 BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "")
 
 
-# 1. Route racine pour éviter le 404 quand on visite l'URL de base de ton Render
+# 1. Route racine : sert directement ton fichier index.html stocké dans le dossier "templates"
 @app.route("/", methods=["GET"])
 def home():
-  return jsonify({"status": "success", "message": "F9UM API Services en ligne"})
+  return render_template("index.html")
 
 
 # 2. Route de recherche interrogée par ton front-end
