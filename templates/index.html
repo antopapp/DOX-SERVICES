@@ -8,52 +8,28 @@
     
     <style>
         :root {
-            /* Noir extrême */
             --bg-dark: #000000;
-            
-            /* Glassmorphism sur fond noir */
             --glass-bg: rgba(255, 255, 255, 0.03);
             --glass-card: rgba(15, 15, 22, 0.7);
             --glass-border: rgba(255, 255, 255, 0.12);
             --glass-shine: rgba(255, 255, 255, 0.22);
-            
-            /* Couleurs Néon */
             --neon-purple: #8b5cf6;
             --neon-blue: #3b82f6;
             --neon-cyan: #06b6d4;
             --neon-green: #10b981;
-            
             --text-main: #f8fafc;
             --text-muted: #a1a1aa;
-            
             --font-sans: 'Inter', system-ui, sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
         }
 
-        /* CUSTOM SCROLLBAR CYBER */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #000000;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(139, 92, 246, 0.3);
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--neon-purple);
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000000; }
+        ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--neon-purple); }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
 
         body {
             background-color: var(--bg-dark);
@@ -64,7 +40,6 @@
             position: relative;
         }
 
-        /* LIGHT BEAM GLOW */
         .light-beam {
             position: fixed;
             top: -30%;
@@ -90,7 +65,6 @@
             100% { transform: translate(-5%, 15%) rotate(360deg) scale(0.95); }
         }
 
-        /* CYBER GRID OVERLAY */
         body::after {
             content: '';
             position: fixed;
@@ -123,7 +97,6 @@
             gap: 25px;
         }
 
-        /* BADGE GLOW HOVER */
         .records-badge {
             display: inline-flex;
             align-items: center;
@@ -147,7 +120,6 @@
             box-shadow: 0 5px 15px rgba(16, 185, 129, 0.15);
         }
 
-        /* RECORDS PULSE DOT */
         .green-dot {
             width: 8px;
             height: 8px;
@@ -159,19 +131,10 @@
         }
 
         @keyframes slowPulse {
-            0%, 100% {
-                opacity: 1;
-                transform: scale(1);
-                box-shadow: 0 0 8px var(--neon-green);
-            }
-            50% {
-                opacity: 0.25;
-                transform: scale(0.85);
-                box-shadow: 0 0 2px var(--neon-green);
-            }
+            0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--neon-green); }
+            50% { opacity: 0.25; transform: scale(0.85); box-shadow: 0 0 2px var(--neon-green); }
         }
 
-        /* GLASS CARD REFLECTION & HEADER HOVER FLOAT */
         .glass-header {
             padding: 25px 65px;
             border-radius: 24px;
@@ -179,9 +142,7 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--glass-border);
-            box-shadow: 
-                0 20px 50px rgba(0, 0, 0, 0.9),
-                inset 0 1px 1px var(--glass-shine);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), inset 0 1px 1px var(--glass-shine);
             position: relative;
             overflow: hidden;
             transition: transform 0.4s ease, border-color 0.4s ease;
@@ -192,17 +153,11 @@
             border-color: rgba(139, 92, 246, 0.4);
         }
 
-        /* HEADER SHINE SWEEP */
         .glass-header::before {
             content: '';
             position: absolute;
             top: -50%; left: -50%; width: 200%; height: 200%;
-            background: linear-gradient(
-                45deg, 
-                transparent 45%, 
-                rgba(255, 255, 255, 0.12) 50%, 
-                transparent 55%
-            );
+            background: linear-gradient(45deg, transparent 45%, rgba(255, 255, 255, 0.12) 50%, transparent 55%);
             animation: shineSweep 7s infinite;
             pointer-events: none;
         }
@@ -212,7 +167,6 @@
             20%, 100% { transform: translate(100%, 100%); }
         }
 
-        /* HEADER 3D TEXT RELIEF */
         .glass-header h1 {
             font-family: var(--font-mono);
             font-size: 3rem;
@@ -221,14 +175,8 @@
             text-transform: uppercase;
             color: #ffffff;
             text-shadow: 
-                0 1px 0 #cccccc,
-                0 2px 0 #c9c9c9,
-                0 3px 0 #bbb,
-                0 4px 0 #b9b9b9,
-                0 5px 0 #aaa,
-                0 6px 1px rgba(0,0,0,.5),
-                0 0 15px rgba(139, 92, 246, 0.6),
-                0 0 30px rgba(139, 92, 246, 0.4);
+                0 1px 0 #cccccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa,
+                0 6px 1px rgba(0,0,0,.5), 0 0 15px rgba(139, 92, 246, 0.6), 0 0 30px rgba(139, 92, 246, 0.4);
         }
 
         .typing-container {
@@ -238,7 +186,6 @@
             min-height: 40px;
         }
 
-        /* TYPEWRITER CURSOR BLINK */
         .typed-text {
             color: var(--neon-cyan);
             font-family: var(--font-mono);
@@ -253,7 +200,6 @@
             50% { border-color: var(--neon-purple); }
         }
 
-        /* HERO BTN SHIMMER & CLICK PRESS */
         .btn-hero {
             padding: 18px 40px;
             border-radius: 16px;
@@ -270,18 +216,12 @@
             transition: all 0.3s ease;
             box-shadow: 0 10px 30px rgba(139, 92, 246, 0.35);
             display: inline-block;
-            position: relative;
-            overflow: hidden;
         }
 
         .btn-hero:hover {
             transform: translateY(-4px) scale(1.02);
             box-shadow: 0 15px 40px rgba(139, 92, 246, 0.55);
             filter: brightness(1.1);
-        }
-
-        .btn-hero:active {
-            transform: translateY(1px) scale(0.98);
         }
 
         .search-section {
@@ -297,7 +237,6 @@
             margin-bottom: 25px;
         }
 
-        /* CATEGORY BTN HOVER LIFT */
         .cat-btn {
             padding: 12px 20px;
             border-radius: 14px;
@@ -319,18 +258,11 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
-        /* CATEGORY ACTIVE PULSE */
         .cat-btn.active {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(59, 130, 246, 0.35));
             border-color: var(--neon-purple);
             color: #ffffff;
             box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
-            animation: pulseActive 2s infinite alternate;
-        }
-
-        @keyframes pulseActive {
-            0% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
-            100% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.8); }
         }
 
         .search-card {
@@ -346,7 +278,6 @@
             margin-bottom: 30px;
         }
 
-        /* INPUT FOCUS NEON HALO & HOVER BORDER */
         input[type="text"] {
             flex: 1;
             padding: 16px 22px;
@@ -359,17 +290,12 @@
             transition: all 0.3s ease;
         }
 
-        input[type="text"]:hover {
-            border-color: rgba(255, 255, 255, 0.25);
-        }
-
         input[type="text"]:focus {
             border-color: var(--neon-purple);
             box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
             background: #08080f;
         }
 
-        /* SEARCH BTN GRADIENT SHIFT */
         button.btn-search {
             padding: 0 35px;
             border-radius: 14px;
@@ -397,14 +323,12 @@
             gap: 20px;
         }
 
-        /* CARD FADE IN UP & BORDER GLOW */
         .result-card {
             background: var(--glass-card);
             backdrop-filter: blur(16px);
             border: 1px solid var(--glass-border);
             border-radius: 18px;
             padding: 24px;
-            position: relative;
             animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             transition: all 0.3s ease;
         }
@@ -414,26 +338,13 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .result-card:hover {
-            border-color: rgba(6, 182, 212, 0.5);
-            transform: translateY(-4px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
-        }
-
         .field-box {
             background: rgba(255, 255, 255, 0.02);
             padding: 14px;
             border-radius: 10px;
             border-left: 3px solid var(--neon-purple);
-            transition: border-color 0.3s ease, background 0.3s ease;
         }
 
-        .result-card:hover .field-box {
-            border-left-color: var(--neon-cyan);
-            background: rgba(255, 255, 255, 0.05);
-        }
-
-        /* CONFIDENCE BADGE GLOW */
         .badge {
             font-family: var(--font-mono);
             background: rgba(59, 130, 246, 0.15);
@@ -442,10 +353,8 @@
             border-radius: 6px;
             font-size: 11px;
             border: 1px solid rgba(59, 130, 246, 0.3);
-            box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
         }
 
-        /* NEON LOADING SPINNER */
         .spinner-container {
             display: flex;
             flex-direction: column;
@@ -461,17 +370,10 @@
             border-radius: 50%;
             border-top-color: var(--neon-cyan);
             animation: spin 0.8s linear infinite;
-            filter: drop-shadow(0 0 8px var(--neon-cyan));
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
-        }
-
-        @media (max-width: 768px) {
-            .glass-header h1 { font-size: 2rem; }
-            .hero-section { min-height: 60vh; }
-            .search-card { flex-direction: column; }
         }
     </style>
 </head>
@@ -481,7 +383,6 @@
 
 <div class="container">
     <section class="hero-section">
-        
         <div class="records-badge">
             <span class="green-dot"></span>
             11 102 943 233 enregistrements indexés
@@ -521,7 +422,6 @@
 </div>
 
 <script>
-    // EFFET TYPEWRITER BOUCLÉ
     const words = ["les enquêteurs.", "les analystes.", "la recherche de données.", "la cybersécurité."];
     let wordIndex = 0;
     let charIndex = 0;
@@ -530,7 +430,6 @@
 
     function typeEffect() {
         const currentWord = words[wordIndex];
-        
         if (isDeleting) {
             typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
             charIndex--;
@@ -540,7 +439,6 @@
         }
 
         let typeSpeed = isDeleting ? 40 : 90;
-
         if (!isDeleting && charIndex === currentWord.length) {
             typeSpeed = 2200;
             isDeleting = true;
@@ -549,13 +447,10 @@
             wordIndex = (wordIndex + 1) % words.length;
             typeSpeed = 400;
         }
-
         setTimeout(typeEffect, typeSpeed);
     }
-
     document.addEventListener("DOMContentLoaded", typeEffect);
 
-    // GESTION DES CATÉGORIES ET DE LA RECHERCHE
     let activeModule = 'email';
 
     function selectCategory(btn, moduleValue, placeholderText) {
@@ -575,64 +470,72 @@
 
         if (!query) return;
 
-        // 1. Afficher l'animation avec message d'attente Render
         area.innerHTML = `
             <div class="spinner-container">
                 <div class="spinner"></div>
                 <p style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-mono);">
-                    Connexion au serveur Render... (Cela peut prendre ~30s si le serveur était en veille)
+                    Connexion au serveur Render... (Réveil potentiel ~30s)
                 </p>
             </div>
         `;
 
         try {
-            const RENDER_URL = "https://f9um-services.onrender.com"; 
-
-            // Configuration de la requête avec timeout
+            const RENDER_URL = "https://f9um-backend.onrender.com"; 
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 secondes max
+            const timeoutId = setTimeout(() => controller.abort(), 45000);
 
             const response = await fetch(`${RENDER_URL}/search?type=${activeModule}&q=${encodeURIComponent(query)}`, {
                 method: 'GET',
                 signal: controller.signal,
-                headers: {
-                    'Accept': 'application/json'
-                }
+                headers: { 'Accept': 'application/json' }
             });
             
             clearTimeout(timeoutId);
 
             if (!response.ok) {
-                throw new Error(`Le serveur Render a répondu avec le code HTTP : ${response.status}`);
+                throw new Error(`Erreur serveur : ${response.status}`);
             }
 
             const data = await response.json();
 
-            // 2. Affichage des résultats
-            area.innerHTML = `
-                <div class="result-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                        <span style="font-family: var(--font-mono); font-weight: 700; color: var(--neon-cyan);">Cible : ${query}</span>
-                        <span class="badge">MODULE : ${activeModule.toUpperCase()}</span>
+            // AFFICHAGE PROPRE SANS JSON BRUT
+            if (data.status === 'success' && data.results && data.results.length > 0) {
+                let htmlResults = '';
+                
+                data.results.forEach(item => {
+                    htmlResults += `
+                        <div class="result-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <span class="badge">SOURCE : ${item.source || 'F9UM API'}</span>
+                                <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">TYPE : ${item.type || activeModule}</span>
+                            </div>
+                            <div class="field-box">
+                                <p style="color: var(--text-main); font-size: 0.95rem; font-family: var(--font-mono); white-space: pre-line; word-break: break-all;">
+                                    ${item.data}
+                                </p>
+                            </div>
+                        </div>
+                    `;
+                });
+                area.innerHTML = htmlResults;
+            } else {
+                area.innerHTML = `
+                    <div class="result-card">
+                        <div class="field-box" style="border-left-color: var(--neon-cyan);">
+                            <p style="color: var(--neon-cyan); font-family: var(--font-mono);">Aucun résultat trouvé pour cette requête.</p>
+                        </div>
                     </div>
-                    <div class="field-box">
-                        <pre style="font-size: 0.85rem; color: var(--text-main); white-space: pre-wrap; word-break: break-all; font-family: var(--font-mono);">${JSON.stringify(data, null, 2)}</pre>
-                    </div>
-                </div>
-            `;
+                `;
+            }
 
         } catch (err) {
             let detail = err.message;
-            if (err.name === 'AbortError') {
-                detail = "Le serveur Render met trop de temps à répondre (Timeout).";
-            } else if (err.message === 'Failed to fetch') {
-                detail = "Impossible de contacter l'API. Vérifie que CORS est activé sur ton Flask/Express ou que le serveur Render n'est pas en train de redémarrer.";
-            }
+            if (err.name === 'AbortError') detail = "Le serveur Render a mis trop de temps à répondre (Timeout).";
 
             area.innerHTML = `
                 <div class="result-card" style="border-color: rgba(239, 68, 68, 0.5);">
                     <div class="field-box" style="border-left-color: #ef4444;">
-                        <p style="color: #ef4444; font-weight: 700; margin-bottom: 5px;">Erreur de connexion à l'API</p>
+                        <p style="color: #ef4444; font-weight: 700; margin-bottom: 5px;">Erreur de communication</p>
                         <p style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-mono);">${detail}</p>
                     </div>
                 </div>
