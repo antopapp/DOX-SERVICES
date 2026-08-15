@@ -30,7 +30,7 @@
             --font-mono: 'JetBrains Mono', monospace;
         }
 
-        /* 22. CUSTOM SCROLLBAR CYBER */
+        /* CUSTOM SCROLLBAR CYBER */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -64,7 +64,7 @@
             position: relative;
         }
 
-        /* 1. LIGHT BEAM GLOW (FAISCEAU ANIMÉ) */
+        /* LIGHT BEAM GLOW */
         .light-beam {
             position: fixed;
             top: -30%;
@@ -90,7 +90,7 @@
             100% { transform: translate(-5%, 15%) rotate(360deg) scale(0.95); }
         }
 
-        /* 2. CYBER GRID OVERLAY (GRILLE ARRIÈRE-PLAN) */
+        /* CYBER GRID OVERLAY */
         body::after {
             content: '';
             position: fixed;
@@ -123,7 +123,7 @@
             gap: 25px;
         }
 
-        /* 4. BADGE GLOW HOVER */
+        /* BADGE GLOW HOVER */
         .records-badge {
             display: inline-flex;
             align-items: center;
@@ -147,7 +147,7 @@
             box-shadow: 0 5px 15px rgba(16, 185, 129, 0.15);
         }
 
-        /* 3. RECORDS PULSE DOT (VOYANT VERT) */
+        /* RECORDS PULSE DOT */
         .green-dot {
             width: 8px;
             height: 8px;
@@ -171,7 +171,7 @@
             }
         }
 
-        /* 6 & 8. GLASS CARD REFLECTION + HEADER HOVER FLOAT */
+        /* GLASS CARD REFLECTION & HEADER HOVER FLOAT */
         .glass-header {
             padding: 25px 65px;
             border-radius: 24px;
@@ -192,7 +192,7 @@
             border-color: rgba(139, 92, 246, 0.4);
         }
 
-        /* 7. HEADER SHINE SWEEP (BALAYAGE LUMINEUX) */
+        /* HEADER SHINE SWEEP */
         .glass-header::before {
             content: '';
             position: absolute;
@@ -212,7 +212,7 @@
             20%, 100% { transform: translate(100%, 100%); }
         }
 
-        /* 5. HEADER 3D TEXT RELIEF */
+        /* HEADER 3D TEXT RELIEF */
         .glass-header h1 {
             font-family: var(--font-mono);
             font-size: 3rem;
@@ -238,7 +238,7 @@
             min-height: 40px;
         }
 
-        /* 9. TYPEWRITER CURSOR BLINK */
+        /* TYPEWRITER CURSOR BLINK */
         .typed-text {
             color: var(--neon-cyan);
             font-family: var(--font-mono);
@@ -253,7 +253,7 @@
             50% { border-color: var(--neon-purple); }
         }
 
-        /* 10 & 11. HERO BTN SHIMMER & CLICK PRESS */
+        /* HERO BTN SHIMMER & CLICK PRESS */
         .btn-hero {
             padding: 18px 40px;
             border-radius: 16px;
@@ -297,7 +297,7 @@
             margin-bottom: 25px;
         }
 
-        /* 13. CATEGORY BTN HOVER LIFT */
+        /* CATEGORY BTN HOVER LIFT */
         .cat-btn {
             padding: 12px 20px;
             border-radius: 14px;
@@ -319,7 +319,7 @@
             box-shadow: 0 8px 20px rgba(0,0,0,0.5);
         }
 
-        /* 12. CATEGORY ACTIVE PULSE */
+        /* CATEGORY ACTIVE PULSE */
         .cat-btn.active {
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(59, 130, 246, 0.35));
             border-color: var(--neon-purple);
@@ -346,7 +346,7 @@
             margin-bottom: 30px;
         }
 
-        /* 14 & 15. INPUT FOCUS NEON HALO + HOVER BORDER */
+        /* INPUT FOCUS NEON HALO & HOVER BORDER */
         input[type="text"] {
             flex: 1;
             padding: 16px 22px;
@@ -369,7 +369,7 @@
             background: #08080f;
         }
 
-        /* 16. SEARCH BTN GRADIENT SHIFT */
+        /* SEARCH BTN GRADIENT SHIFT */
         button.btn-search {
             padding: 0 35px;
             border-radius: 14px;
@@ -397,7 +397,7 @@
             gap: 20px;
         }
 
-        /* 17, 18 & 19. CARD FADE IN UP + BORDER GLOW + FIELD ACCENT SLIDE */
+        /* CARD FADE IN UP & BORDER GLOW */
         .result-card {
             background: var(--glass-card);
             backdrop-filter: blur(16px);
@@ -422,7 +422,7 @@
 
         .field-box {
             background: rgba(255, 255, 255, 0.02);
-            padding: 12px 16px;
+            padding: 14px;
             border-radius: 10px;
             border-left: 3px solid var(--neon-purple);
             transition: border-color 0.3s ease, background 0.3s ease;
@@ -433,7 +433,7 @@
             background: rgba(255, 255, 255, 0.05);
         }
 
-        /* 20. CONFIDENCE BADGE GLOW */
+        /* CONFIDENCE BADGE GLOW */
         .badge {
             font-family: var(--font-mono);
             background: rgba(59, 130, 246, 0.15);
@@ -445,7 +445,7 @@
             box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
         }
 
-        /* 21. NEON LOADING SPINNER */
+        /* NEON LOADING SPINNER */
         .spinner-container {
             display: flex;
             justify-content: center;
@@ -573,15 +573,26 @@
 
         if (!query) return;
 
-        // 1. Démarrer l'animation de chargement
+        // 1. Afficher l'animation de chargement
         area.innerHTML = `
             <div class="spinner-container">
                 <div class="spinner"></div>
             </div>
         `;
 
-        // 2. Traitement du résultat après un délai de 1.5 seconde
-        setTimeout(() => {
+        try {
+            // URL configurée avec le backend Render
+            const RENDER_URL = "https://f9um-backend.onrender.com"; 
+
+            const response = await fetch(`${RENDER_URL}/search?type=${activeModule}&q=${encodeURIComponent(query)}`);
+            
+            if (!response.ok) {
+                throw new Error(`Erreur serveur : ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // 2. Affichage des données reçues depuis l'API
             area.innerHTML = `
                 <div class="result-card">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
@@ -589,16 +600,21 @@
                         <span class="badge">MODULE : ${activeModule.toUpperCase()}</span>
                     </div>
                     <div class="field-box">
-                        <p style="font-size: 0.9rem; color: var(--text-main); margin-bottom: 5px; font-weight: 600;">
-                            Enregistrement système trouvé
-                        </p>
-                        <p style="font-size: 0.85rem; color: var(--text-muted);">
-                            Données associées indexées avec succès. Prêt à être relié à une API backend.
-                        </p>
+                        <pre style="font-size: 0.85rem; color: var(--text-main); white-space: pre-wrap; word-break: break-all; font-family: var(--font-mono);">${JSON.stringify(data, null, 2)}</pre>
                     </div>
                 </div>
             `;
-        }, 1500);
+
+        } catch (err) {
+            area.innerHTML = `
+                <div class="result-card" style="border-color: rgba(239, 68, 68, 0.5);">
+                    <div class="field-box" style="border-left-color: #ef4444;">
+                        <p style="color: #ef4444; font-weight: 700; margin-bottom: 5px;">Erreur de connexion à l'API</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">${err.message}</p>
+                    </div>
+                </div>
+            `;
+        }
     }
 </script>
 
