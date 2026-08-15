@@ -9,7 +9,7 @@ CORS(app)
 # Récupère ta clé API Brix Hub depuis les variables d'environnement de Render
 # (Conseil : Mets ta clé dans les "Environment Variables" de ton dashboard Render sous le nom BRIX_API_KEY)
 BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "TA_CLE_API_PAR_DEFAUT")
-BRIX_API_URL = "https://api.brixhub.com/v1/search"  # <--- Remplace par l'URL exacte de l'API Brix Hub si elle est différente
+BRIX_API_URL = "https://brixhub.cc/"  # <--- Remplace par l'URL exacte de l'API Brix Hub si elle est différente
 
 
 @app.route("/search", methods=["GET"])
