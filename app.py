@@ -6,9 +6,10 @@ import os
 
 app = Flask(__name__)
 
+# Base de l'API BrixHub
 BRIXHUB_BASE_URL = "https://api.brixhub.is/api/v1"
 
-# Récupération de la clé API configurée dans Render
+# Récupération de la clé API configurée dans les variables d'environnement Render
 API_KEY = os.getenv('BRIXHUB_API_KEY', '')
 
 def get_headers():
@@ -17,7 +18,7 @@ def get_headers():
         "Content-Type": "application/json"
     }
 
-# --- RECHERCHES BRIXHUB ---
+# --- FONCTIONS DE RECHERCHE BRIXHUB ---
 
 def search_email(email):
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
@@ -49,7 +50,7 @@ def search_phone(phone):
 def search_fullname(fullname):
     parts = fullname.strip().split()
     if len(parts) < 2:
-        return {"error": "Veuillez entrer un Prénom ET un Nom (ex: Jean Dupont)."}
+        return {"error": "Veuillez entrer au moins un Prénom ET un Nom (ex: Jean Dupont)."}
     
     prenom = parts[0]
     nom_famille = " ".join(parts[1:])
@@ -59,7 +60,7 @@ def search_fullname(fullname):
         "nom_famille": nom_famille,
         "prenom": prenom,
         "flexible": True,
-        "per_page": 10
+        "per_page": 100  # Modifié pour obtenir jusqu'à 100 résultats par page
     }
     
     try:
@@ -79,7 +80,7 @@ def home():
 def search():
     data = request.get_json() or {}
     query = data.get('query', '').strip()
-    search_type = data.get('module', 'email')
+    search_type = data.get('module', 'fullname')
     
     if not query:
         return jsonify({"error": "Veuillez entrer une valeur à chercher."}), 400
@@ -91,7 +92,7 @@ def search():
     elif search_type == 'fullname':
         results = search_fullname(query)
     else:
-        return jsonify({"error": "Type de recherche inconnu."}), 400
+        return jsonify({"error": "Type de recherche non pris en charge."}), 400
         
     return jsonify(results)
 
