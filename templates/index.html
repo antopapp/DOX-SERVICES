@@ -480,7 +480,7 @@
         `;
 
         try {
-            const RENDER_URL = "https://f9um-backend.onrender.com"; 
+            const RENDER_URL = "https://f9um-services.onrender.com"; 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 45000);
 
@@ -498,7 +498,6 @@
 
             const data = await response.json();
 
-            // AFFICHAGE PROPRE SANS JSON BRUT
             if (data.status === 'success' && data.results && data.results.length > 0) {
                 let htmlResults = '';
                 
