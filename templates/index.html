@@ -3,243 +3,579 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F9UM SERVICES - OSINT Platform</title>
+    <title>F9UM SERVICES | OSINT Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains-Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --bg-color: #0b0f19;
-            --card-bg: #111827;
-            --accent-color: #6366f1;
-            --text-main: #f3f4f6;
-            --text-muted: #9ca3af;
-            --border-color: #1f2937;
+            /* Noir extrême */
+            --bg-dark: #000000;
+            
+            /* Glassmorphism sur fond noir */
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-card: rgba(15, 15, 22, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass-shine: rgba(255, 255, 255, 0.22);
+            
+            /* Couleurs Néon */
+            --neon-purple: #8b5cf6;
+            --neon-blue: #3b82f6;
+            --neon-cyan: #06b6d4;
+            --neon-green: #10b981;
+            
+            --text-main: #f8fafc;
+            --text-muted: #a1a1aa;
+            
+            --font-sans: 'Inter', system-ui, sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* 22. CUSTOM SCROLLBAR CYBER */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000000;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(139, 92, 246, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--neon-purple);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         body {
-            background-color: var(--bg-color);
+            background-color: var(--bg-dark);
             color: var(--text-main);
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 1. LIGHT BEAM GLOW (FAISCEAU ANIMÉ) */
+        .light-beam {
+            position: fixed;
+            top: -30%;
+            left: -30%;
+            width: 160vw;
+            height: 160vh;
+            background: radial-gradient(
+                circle at 50% 50%, 
+                rgba(139, 92, 246, 0.22) 0%, 
+                rgba(59, 130, 246, 0.12) 35%, 
+                rgba(6, 182, 212, 0.04) 60%, 
+                transparent 80%
+            );
+            filter: blur(100px);
+            z-index: -2;
+            pointer-events: none;
+            animation: moveBeam 14s infinite alternate ease-in-out;
+        }
+
+        @keyframes moveBeam {
+            0% { transform: translate(-10%, -10%) rotate(0deg) scale(1); }
+            50% { transform: translate(15%, 10%) rotate(180deg) scale(1.15); }
+            100% { transform: translate(-5%, 15%) rotate(360deg) scale(0.95); }
+        }
+
+        /* 2. CYBER GRID OVERLAY (GRILLE ARRIÈRE-PLAN) */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            pointer-events: none;
         }
 
         .container {
             width: 100%;
-            max-width: 800px;
-        }
-
-        h1 {
-            text-align: center;
-            color: var(--accent-color);
-            margin-bottom: 25px;
-            font-size: 2rem;
-            letter-spacing: 1px;
-        }
-
-        .search-box {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
             display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .hero-section {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            gap: 25px;
+        }
+
+        /* 4. BADGE GLOW HOVER */
+        .records-badge {
+            display: inline-flex;
+            align-items: center;
             gap: 10px;
-            margin-bottom: 25px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-        }
-
-        select, input, button {
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: #1f2937;
-            color: white;
-            font-size: 14px;
-            outline: none;
-        }
-
-        select { flex: 1; }
-        input { flex: 2; }
-
-        button {
-            background: var(--accent-color);
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
-            border: none;
-        }
-
-        button:hover {
-            background: #4f46e5;
-        }
-
-        .results-header {
-            margin-bottom: 15px;
-            font-size: 1.1rem;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
             color: var(--text-muted);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 8px 18px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
         }
 
-        .result-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        .records-badge:hover {
+            border-color: rgba(16, 185, 129, 0.4);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.15);
         }
 
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        /* 3. RECORDS PULSE DOT (VOYANT VERT) */
+        .green-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--neon-green);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--neon-green);
+            animation: slowPulse 2.5s infinite ease-in-out;
+        }
+
+        @keyframes slowPulse {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 8px var(--neon-green);
+            }
+            50% {
+                opacity: 0.25;
+                transform: scale(0.85);
+                box-shadow: 0 0 2px var(--neon-green);
+            }
+        }
+
+        /* 6 & 8. GLASS CARD REFLECTION + HEADER HOVER FLOAT */
+        .glass-header {
+            padding: 25px 65px;
+            border-radius: 24px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.9),
+                inset 0 1px 1px var(--glass-shine);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.4s ease, border-color 0.4s ease;
+        }
+
+        .glass-header:hover {
+            transform: translateY(-4px);
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        /* 7. HEADER SHINE SWEEP (BALAYAGE LUMINEUX) */
+        .glass-header::before {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: linear-gradient(
+                45deg, 
+                transparent 45%, 
+                rgba(255, 255, 255, 0.12) 50%, 
+                transparent 55%
+            );
+            animation: shineSweep 7s infinite;
+            pointer-events: none;
+        }
+
+        @keyframes shineSweep {
+            0% { transform: translate(-100%, -100%); }
+            20%, 100% { transform: translate(100%, 100%); }
+        }
+
+        /* 5. HEADER 3D TEXT RELIEF */
+        .glass-header h1 {
+            font-family: var(--font-mono);
+            font-size: 3rem;
+            font-weight: 800;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            color: #ffffff;
+            text-shadow: 
+                0 1px 0 #cccccc,
+                0 2px 0 #c9c9c9,
+                0 3px 0 #bbb,
+                0 4px 0 #b9b9b9,
+                0 5px 0 #aaa,
+                0 6px 1px rgba(0,0,0,.5),
+                0 0 15px rgba(139, 92, 246, 0.6),
+                0 0 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .typing-container {
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            min-height: 40px;
+        }
+
+        /* 9. TYPEWRITER CURSOR BLINK */
+        .typed-text {
+            color: var(--neon-cyan);
+            font-family: var(--font-mono);
+            font-weight: 700;
+            border-right: 3px solid var(--neon-purple);
+            padding-right: 5px;
+            animation: blinkCursor 0.75s step-end infinite;
+        }
+
+        @keyframes blinkCursor {
+            from, to { border-color: transparent }
+            50% { border-color: var(--neon-purple); }
+        }
+
+        /* 10 & 11. HERO BTN SHIMMER & CLICK PRESS */
+        .btn-hero {
+            padding: 18px 40px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.35);
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-hero:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(139, 92, 246, 0.55);
+            filter: brightness(1.1);
+        }
+
+        .btn-hero:active {
+            transform: translateY(1px) scale(0.98);
+        }
+
+        .search-section {
+            width: 100%;
+            padding-top: 50px;
+        }
+
+        .category-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
             gap: 12px;
-            margin-top: 10px;
+            margin-bottom: 25px;
+        }
+
+        /* 13. CATEGORY BTN HOVER LIFT */
+        .cat-btn {
+            padding: 12px 20px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cat-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+        }
+
+        /* 12. CATEGORY ACTIVE PULSE */
+        .cat-btn.active {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.35), rgba(59, 130, 246, 0.35));
+            border-color: var(--neon-purple);
+            color: #ffffff;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+            animation: pulseActive 2s infinite alternate;
+        }
+
+        @keyframes pulseActive {
+            0% { box-shadow: 0 0 15px rgba(139, 92, 246, 0.4); }
+            100% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.8); }
+        }
+
+        .search-card {
+            background: var(--glass-card);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 22px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.8);
+            margin-bottom: 30px;
+        }
+
+        /* 14 & 15. INPUT FOCUS NEON HALO + HOVER BORDER */
+        input[type="text"] {
+            flex: 1;
+            padding: 16px 22px;
+            border-radius: 14px;
+            border: 1px solid var(--glass-border);
+            background: #050508;
+            color: var(--text-main);
+            font-size: 15px;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:hover {
+            border-color: rgba(255, 255, 255, 0.25);
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--neon-purple);
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.35);
+            background: #08080f;
+        }
+
+        /* 16. SEARCH BTN GRADIENT SHIFT */
+        button.btn-search {
+            padding: 0 35px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+            color: #ffffff;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        button.btn-search:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.6);
+            filter: brightness(1.15);
+        }
+
+        #resultsArea {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* 17, 18 & 19. CARD FADE IN UP + BORDER GLOW + FIELD ACCENT SLIDE */
+        .result-card {
+            background: var(--glass-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 18px;
+            padding: 24px;
+            position: relative;
+            animation: fadeInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            transition: all 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-card:hover {
+            border-color: rgba(6, 182, 212, 0.5);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
         }
 
         .field-box {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 8px 12px;
-            border-radius: 6px;
-            border-left: 3px solid var(--accent-color);
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px 14px;
+            border-radius: 10px;
+            border-left: 3px solid var(--neon-purple);
+            transition: border-color 0.3s ease, background 0.3s ease;
         }
 
-        .field-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 3px;
+        .result-card:hover .field-box {
+            border-left-color: var(--neon-cyan);
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .field-value {
-            font-size: 14px;
-            font-weight: 500;
-            word-break: break-all;
-        }
-
-        .badge-container {
-            margin-top: 15px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-
+        /* 20. CONFIDENCE BADGE GLOW */
         .badge {
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            border: 1px solid rgba(99, 102, 241, 0.3);
-        }
-
-        .confidence-badge {
-            float: right;
-            background: #059669;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
+            font-family: var(--font-mono);
+            background: rgba(59, 130, 246, 0.15);
+            color: #93c5fd;
+            padding: 4px 10px;
+            border-radius: 6px;
             font-size: 11px;
-            font-weight: bold;
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.1);
         }
 
-        .loading, .empty {
-            text-align: center;
+        /* 21. NEON LOADING SPINNER */
+        .spinner-container {
+            display: flex;
+            justify-content: center;
             padding: 30px;
-            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 45px;
+            height: 45px;
+            border: 3px solid rgba(139, 92, 246, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--neon-cyan);
+            animation: spin 0.8s linear infinite;
+            filter: drop-shadow(0 0 8px var(--neon-cyan));
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 768px) {
+            .glass-header h1 { font-size: 2rem; }
+            .hero-section { min-height: 60vh; }
+            .search-card { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
+<div class="light-beam"></div>
+
 <div class="container">
-    <h1>F9UM OSINT SEARCH</h1>
+    <section class="hero-section">
+        
+        <div class="records-badge">
+            <span class="green-dot"></span>
+            11 102 943 233 enregistrements indexés
+        </div>
 
-    <div class="search-box">
-        <select id="moduleSelect">
-            <option value="fullname">Nom & Prénom</option>
-            <option value="email">Adresse E-mail</option>
-            <option value="phone">Téléphone</option>
-        </select>
-        <input type="text" id="queryInput" placeholder="Ex: Jean Dupont">
-        <button onclick="lancerRecherche()">Rechercher</button>
-    </div>
+        <div class="glass-header">
+            <h1>F9UM SERVICES</h1>
+        </div>
 
-    <div id="resultsArea"></div>
+        <div class="typing-container">
+            Une plateforme OSINT faite pour <span class="typed-text" id="typewriter"></span>
+        </div>
+
+        <a href="#searchSection" class="btn-hero">Lancer une recherche</a>
+    </section>
+
+    <section id="searchSection" class="search-section">
+        <div class="category-grid">
+            <button class="cat-btn active" onclick="selectCategory(this, 'email', 'Ex: nom@exemple.com')">Adresse E-mail</button>
+            <button class="cat-btn" onclick="selectCategory(this, 'phone', 'Ex: 0612345678')">Numéro de téléphone</button>
+            <button class="cat-btn" onclick="selectCategory(this, 'lastname', 'Ex: Dupont')">Nom</button>
+            <button class="cat-btn" onclick="selectCategory(this, 'firstname', 'Ex: Jean')">Prénom</button>
+            <button class="cat-btn" onclick="selectCategory(this, 'username', 'Ex: Pseudo123')">Nom d'utilisateur</button>
+            <button class="cat-btn" onclick="selectCategory(this, 'ip', 'Ex: 192.168.1.1')">Adresse IP</button>
+            <button class="cat-btn" onclick="selectCategory(this, 'address', 'Ex: 12 Rue de la Paix')">Adresse</button>
+            <button class="cat-btn" onclick="selectCategory(this, 'city', 'Ex: Paris')">Ville</button>
+            <button class="cat-btn" onclick="selectCategory(this, 'discord_id', 'Ex: 282859044593598464')">Discord ID</button>
+        </div>
+
+        <div class="search-card">
+            <input type="text" id="queryInput" placeholder="Ex: nom@exemple.com">
+            <button class="btn-search" onclick="lancerRecherche()">Rechercher</button>
+        </div>
+
+        <div id="resultsArea"></div>
+    </section>
 </div>
 
 <script>
+    const words = ["les enquêteurs.", "les analystes.", "la recherche de données.", "la cybersécurité."];
+    let wordIndex = 0;
+    let charIndex = 0;
+    let isDeleting = false;
+    const typewriterElement = document.getElementById("typewriter");
+
+    function typeEffect() {
+        const currentWord = words[wordIndex];
+        
+        if (isDeleting) {
+            typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
+            charIndex--;
+        } else {
+            typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
+            charIndex++;
+        }
+
+        let typeSpeed = isDeleting ? 40 : 90;
+
+        if (!isDeleting && charIndex === currentWord.length) {
+            typeSpeed = 2200;
+            isDeleting = true;
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            wordIndex = (wordIndex + 1) % words.length;
+            typeSpeed = 400;
+        }
+
+        setTimeout(typeEffect, typeSpeed);
+    }
+
+    document.addEventListener("DOMContentLoaded", typeEffect);
+
+    let activeModule = 'email';
+
+    function selectCategory(btn, moduleValue, placeholderText) {
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeModule = moduleValue;
+        
+        const input = document.getElementById('queryInput');
+        input.placeholder = placeholderText;
+        input.focus();
+    }
+
     async function lancerRecherche() {
-        const query = document.getElementById('queryInput').value.trim();
-        const module = document.getElementById('moduleSelect').value;
+        const queryInput = document.getElementById('queryInput');
+        const query = queryInput.value.trim();
         const area = document.getElementById('resultsArea');
 
         if (!query) return;
 
-        area.innerHTML = '<div class="loading">Recherche en cours...</div>';
-
-        try {
-            const res = await fetch('/api/search', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ query: query, module: module })
-            });
-
-            const data = await res.json();
-            area.innerHTML = '';
-
-            const list = data?.data?.results || [];
-
-            if (list.length === 0) {
-                area.innerHTML = '<div class="empty">Aucun résultat trouvé.</div>';
-                return;
-            }
-
-            area.innerHTML = `<div class="results-header">${list.length} profil(s) trouvé(s)</div>`;
-
-            list.forEach(item => {
-                let sourcesHtml = '';
-                const sources = item._sources || (item._source_db ? [item._source_db] : []);
-                sources.forEach(s => {
-                    sourcesHtml += `<span class="badge">${s}</span>`;
-                });
-
-                const confHtml = item._confidence ? `<span class="confidence-badge">Score: ${item._confidence}%</span>` : '';
-
-                let fields = '';
-                const keyMap = {
-                    prenom: 'Prénom',
-                    nom_famille: 'Nom',
-                    telephone: 'Téléphone',
-                    email: 'E-mail',
-                    adresse: 'Adresse',
-                    code_postal: 'Code Postal',
-                    ville: 'Ville',
-                    nom_utilisateur: 'Identifiant / Pseudo'
-                };
-
-                for (let key in keyMap) {
-                    if (item[key]) {
-                        fields += `
-                            <div class="field-box">
-                                <div class="field-label">${keyMap[key]}</div>
-                                <div class="field-value">${item[key]}</div>
-                            </div>
-                        `;
-                    }
-                }
-
-                const card = `
-                    <div class="result-card">
-                        ${confHtml}
-                        <div class="card-grid">${fields}</div>
-                        <div class="badge-container">${sourcesHtml}</div>
-                    </div>
-                `;
-                area.innerHTML += card;
-            });
-
-        } catch (err) {
-            area.innerHTML = `<div class="empty" style="color: #ef4444;">Erreur lors de la requête : ${err.message}</div>`;
-        }
+        area.innerHTML = `
+            <div class="spinner-container">
+                <div class="spinner"></div>
+            </div>
+        `;
     }
 </script>
 
