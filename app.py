@@ -1,92 +1,75 @@
 from flask import Flask, jsonify, request, render_template
 import requests
+import urllib.parse
 import re
 import os
 
 app = Flask(__name__)
 
-# --- MODULES DE RECHERCHE AVEC DONNÉES PUBLIQUES ---
+BRIXHUB_BASE_URL = "https://api.brixhub.is/api/v1"
 
-def search_by_email(email):
-    # Validation du format email
+# Récupération de la clé API configurée dans Render
+API_KEY = os.getenv('BRIXHUB_API_KEY', '')
+
+def get_headers():
+    return {
+        "X-API-Key": API_KEY,
+        "Content-Type": "application/json"
+    }
+
+# --- RECHERCHES BRIXHUB ---
+
+def search_email(email):
     if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
         return {"error": "Format d'adresse e-mail invalide."}
     
-    username = email.split('@')[0]
-    domain = email.split('@')[1]
+    encoded_email = urllib.parse.quote(email)
+    url = f"{BRIXHUB_BASE_URL}/lookup/email/{encoded_email}"
     
-    # 1. On réutilise la recherche de pseudo sur la première partie de l'email
-    sites = {
-        "GitHub": f"https://github.com/{username}",
-        "Reddit": f"https://www.reddit.com/user/{username}",
-        "Pinterest": f"https://www.pinterest.com/{username}"
-    }
-    
-    found_profiles = []
-    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-    
-    for platform, url in sites.items():
-        try:
-            res = requests.get(url, headers=headers, timeout=4)
-            if res.status_code == 200:
-                found_profiles.append({"platform": platform, "url": url})
-        except requests.RequestException:
-            pass
+    try:
+        res = requests.get(url, headers=get_headers(), timeout=10)
+        return res.json()
+    except requests.RequestException as e:
+        return {"error": "Erreur de connexion à l'API BrixHub", "details": str(e)}
 
-    return {
-        "email": email,
-        "username_extracted": username,
-        "domain": domain,
-        "possible_profiles": found_profiles if found_profiles else "Aucun profil public direct trouvé"
-    }
-
-def search_by_phone(phone):
-    # Nettoyage du numéro (ne garder que les chiffres et le +)
+def search_phone(phone):
     clean_phone = re.sub(r'[^\d+]', '', phone)
-    
     if len(clean_phone) < 8:
         return {"error": "Numéro de téléphone trop court ou invalide."}
         
-    # Analyse basique de la structure du numéro
-    country = "Inconnu"
-    if clean_phone.startswith("+33") or clean_phone.startswith("06") or clean_phone.startswith("07") or clean_phone.startswith("01"):
-        country = "France (+33)"
-    elif clean_phone.startswith("+1"):
-        country = "USA / Canada (+1)"
-    elif clean_phone.startswith("+32"):
-        country = "Belgique (+32)"
-    elif clean_phone.startswith("+41"):
-        country = "Suisse (+41)"
+    encoded_phone = urllib.parse.quote(clean_phone)
+    url = f"{BRIXHUB_BASE_URL}/lookup/phone/{encoded_phone}"
+    
+    try:
+        res = requests.get(url, headers=get_headers(), timeout=10)
+        return res.json()
+    except requests.RequestException as e:
+        return {"error": "Erreur de connexion à l'API BrixHub", "details": str(e)}
 
-    return {
-        "phone_input": phone,
-        "formatted": clean_phone,
-        "detected_country": country,
-        "note": "Pour des détails plus approfondis (opérateur, fuites de données), connecte ton API privée."
-    }
-
-def search_by_fullname(fullname):
+def search_fullname(fullname):
     parts = fullname.strip().split()
     if len(parts) < 2:
-        return {"error": "Veuillez entrer au moins un Nom ET un Prénom."}
+        return {"error": "Veuillez entrer un Prénom ET un Nom (ex: Jean Dupont)."}
     
-    firstname = parts[0]
-    lastname = " ".join(parts[1:])
+    prenom = parts[0]
+    nom_famille = " ".join(parts[1:])
     
-    # Génération de formats de recherche ou requêtes suggérées
-    return {
-        "query": fullname,
-        "firstname": firstname,
-        "lastname": lastname,
-        "search_links": {
-            "Google_Exact": f"https://www.google.com/search?q=\"{firstname}+{lastname}\"",
-            "LinkedIn": f"https://www.google.com/search?q=site:linkedin.com/in/+\"{firstname}+{lastname}\"",
-            "Twitter_X": f"https://twitter.com/search?q={firstname}%20{lastname}&f=user"
-        }
+    url = f"{BRIXHUB_BASE_URL}/search"
+    payload = {
+        "nom_famille": nom_famille,
+        "prenom": prenom,
+        "flexible": True,
+        "per_page": 10
     }
+    
+    try:
+        res = requests.post(url, json=payload, headers=get_headers(), timeout=10)
+        return res.json()
+    except requests.RequestException as e:
+        return {"error": "Erreur de connexion à l'API BrixHub", "details": str(e)}
 
 
-# --- ROUTES SERVER FLASK ---
+# --- ROUTES FLASK ---
 
 @app.route('/')
 def home():
@@ -94,24 +77,23 @@ def home():
 
 @app.route('/api/search', methods=['POST'])
 def search():
-    data = request.get_json()
+    data = request.get_json() or {}
     query = data.get('query', '').strip()
     search_type = data.get('module', 'email')
     
     if not query:
         return jsonify({"error": "Veuillez entrer une valeur à chercher."}), 400
 
-    # Aiguillage selon le type de recherche
     if search_type == 'email':
-        results = search_by_email(query)
+        results = search_email(query)
     elif search_type == 'phone':
-        results = search_by_phone(query)
+        results = search_phone(query)
     elif search_type == 'fullname':
-        results = search_by_fullname(query)
+        results = search_fullname(query)
     else:
-        return jsonify({"error": "Type de recherche non pris en charge."}), 400
+        return jsonify({"error": "Type de recherche inconnu."}), 400
         
-    return jsonify({"status": "success", "type": search_type, "results": results})
+    return jsonify(results)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
