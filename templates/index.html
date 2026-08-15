@@ -552,24 +552,37 @@
             <div class="spinner-container">
                 <div class="spinner"></div>
                 <p style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-mono);">
-                    Connexion au serveur Render... (~30s si le serveur sort de veille)
+                    Interrogation de l'API Render...
                 </p>
             </div>
         `;
 
         try {
-            // URL exacte de l'API
-            const RENDER_URL = "https://f9um-services.onrender.com"; 
+            const BASE_URL = "https://f9um-services.onrender.com"; 
+
+            // CONFIGURATION ROUTE BACKEND :
+            // Si ton serveur attend du POST : method = 'POST', path = '/search'
+            // Si ton serveur écoute sur la racine en GET : method = 'GET', path = `/?type=${activeModule}&q=${encodeURIComponent(query)}`
+            
+            const path = "/search"; 
+            const options = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    type: activeModule,
+                    query: query
+                })
+            };
 
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-            const response = await fetch(`${RENDER_URL}/search?type=${activeModule}&q=${encodeURIComponent(query)}`, {
-                method: 'GET',
-                signal: controller.signal,
-                headers: {
-                    'Accept': 'application/json'
-                }
+            const response = await fetch(`${BASE_URL}${path}`, {
+                ...options,
+                signal: controller.signal
             });
             
             clearTimeout(timeoutId);
@@ -595,9 +608,9 @@
         } catch (err) {
             let detail = err.message;
             if (err.name === 'AbortError') {
-                detail = "Le serveur a mis trop de temps à répondre (Timeout).";
+                detail = "Le serveur Render met trop de temps à répondre (Cold Start).";
             } else if (err.message === 'Failed to fetch') {
-                detail = "Impossible de contacter l'API. Vérifie la configuration CORS de ton serveur Python/Node sur Render.";
+                detail = "Impossible de contacter l'API (Problème CORS ou serveur offline).";
             }
 
             area.innerHTML = `
