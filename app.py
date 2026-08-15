@@ -6,13 +6,17 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# URL officielle de l'API Brix Hub
 BRIX_BASE_URL = "https://api.brixhub.is/api/v1"
-
-# Récupération de la clé API depuis les variables d'environnement de Render
 BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "")
 
 
+# 1. Route racine pour éviter le 404 quand on visite l'URL de base de ton Render
+@app.route("/", methods=["GET"])
+def home():
+  return jsonify({"status": "success", "message": "F9UM API Services en ligne"})
+
+
+# 2. Route de recherche interrogée par ton front-end
 @app.route("/search", methods=["GET"])
 def search():
   query_type = request.args.get("type")
@@ -27,8 +31,7 @@ def search():
         400,
     )
 
-  # Correspondance entre les champs du front-end et les clés attendues par Brix Hub (/search)
-  # Documentation Brix Hub : nom_famille, prenom, nom_utilisateur, email, telephone, adresse_ip, code_postal, ville, discord_id, etc.
+  # Correspondance des types de ton site vers les champs de l'API Brix Hub
   mapping_types = {
       "email": "email",
       "phone": "telephone",
@@ -43,18 +46,16 @@ def search():
 
   brix_field = mapping_types.get(query_type, "nom_famille")
 
-  # Construction du payload JSON pour l'API Brix Hub
+  # Payload envoyé à l'API Brix Hub
   payload = {brix_field: query_value, "flexible": True, "per_page": 10}
 
   headers = {"X-API-Key": BRIX_API_KEY, "Content-Type": "application/json"}
 
   try:
-    # Appel de l'endpoint POST /search de Brix Hub
     response = requests.post(
         f"{BRIX_BASE_URL}/search", json=payload, headers=headers, timeout=15
     )
 
-    # Gestion des erreurs de l'API Brix Hub
     if response.status_code != 200:
       return (
           jsonify({
@@ -69,14 +70,11 @@ def search():
     brix_data = response.json()
     results = brix_data.get("data", {}).get("results", [])
 
-    # Formatage des résultats pour correspondre exactement à ce qu'attend ton front-end HTML
     formatted_results = []
     for item in results:
-      # On extrait les sources et le score de confiance renvoyés par Brix Hub
       sources = item.get("_sources", ["Brix Hub"])
       confidence = item.get("_confidence", 0)
 
-      # On nettoie l'objet pour ne garder que les infos textuelles à afficher proprement
       details_lines = []
       for key, val in item.items():
         if val and not key.startswith("_"):
