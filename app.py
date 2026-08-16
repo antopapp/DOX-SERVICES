@@ -13,97 +13,83 @@ BRIX_BASE_URL = "https://api.brixhub.is/api/v1"
 BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "")
 
 
-# 1. Route racine : sert directement ton fichier index.html stocké dans le dossier "templates"
 @app.route("/", methods=["GET"])
 def home():
-  return render_template("index.html")
+    return render_template("index.html")
 
 
-# 2. Route de recherche interrogée par ton front-end
 @app.route("/search", methods=["GET"])
 def search():
-  query_type = request.args.get("type")
-  query_value = request.args.get("q")
+    # Récupération de tous les paramètres passés dans l'URL par le front-end
+    allowed_fields = [
+        "nom_famille", "prenom", "nom_naissance", "nom_utilisateur",
+        "email", "telephone", "adresse_ip", "discord_id",
+        "adresse", "code_postal", "ville"
+    ]
+    
+    payload = {}
+    for field in allowed_fields:
+        val = request.args.get(field)
+        if val:
+            payload[field] = val.strip()
 
-  if not query_value:
-    return (
-        jsonify({
+    if not payload:
+        return jsonify({
             "status": "error",
-            "message": "Paramètre de recherche 'q' manquant",
-        }),
-        400,
-    )
+            "message": "Veuillez renseigner au moins un critère de recherche."
+        }), 400
 
-  # Correspondance des types de ton site vers les champs de l'API Brix Hub
-  mapping_types = {
-      "email": "email",
-      "phone": "telephone",
-      "lastname": "nom_famille",
-      "firstname": "prenom",
-      "username": "nom_utilisateur",
-      "ip": "adresse_ip",
-      "address": "adresse",
-      "city": "ville",
-      "discord_id": "discord_id",
-  }
+    # Ajout des options demandées par l'API BrixHub
+    payload["flexible"] = True
+    payload["per_page"] = 15
 
-  brix_field = mapping_types.get(query_type, "nom_famille")
+    headers = {
+        "X-API-Key": BRIX_API_KEY,
+        "Content-Type": "application/json"
+    }
 
-  # Payload envoyé à l'API Brix Hub
-  payload = {brix_field: query_value, "flexible": True, "per_page": 10}
+    try:
+        response = requests.post(
+            f"{BRIX_BASE_URL}/search", json=payload, headers=headers, timeout=15
+        )
 
-  headers = {"X-API-Key": BRIX_API_KEY, "Content-Type": "application/json"}
+        if response.status_code != 200:
+            return jsonify({
+                "status": "error",
+                "message": f"Erreur de l'API Brix Hub (Code {response.status_code})"
+            }), response.status_code
 
-  try:
-    response = requests.post(
-        f"{BRIX_BASE_URL}/search", json=payload, headers=headers, timeout=15
-    )
+        brix_data = response.json()
+        results = brix_data.get("data", {}).get("results", [])
 
-    if response.status_code != 200:
-      return (
-          jsonify({
-              "status": "error",
-              "message": (
-                  f"Erreur de l'API Brix Hub (Code {response.status_code})"
-              ),
-          }),
-          response.status_code,
-      )
+        formatted_results = []
+        for item in results:
+            sources = item.get("_sources", ["Brix Hub"])
+            confidence = item.get("_confidence", 0)
 
-    brix_data = response.json()
-    results = brix_data.get("data", {}).get("results", [])
+            details_lines = []
+            for key, val in item.items():
+                if val and not key.startswith("_"):
+                    details_lines.append(f"{key.upper()} : {val}")
 
-    formatted_results = []
-    for item in results:
-      sources = item.get("_sources", ["Brix Hub"])
-      confidence = item.get("_confidence", 0)
+            details_lines.append(f"SCORE DE CONFIANCE : {confidence}%")
 
-      details_lines = []
-      for key, val in item.items():
-        if val and not key.startswith("_"):
-          details_lines.append(f"{key.upper()} : {val}")
+            formatted_results.append({
+                "source": ", ".join(sources),
+                "type": "MULTI",
+                "data": "\n".join(details_lines),
+            })
 
-      details_lines.append(f"SCORE DE CONFIANCE : {confidence}%")
+        return jsonify({"status": "success", "results": formatted_results})
 
-      formatted_results.append({
-          "source": ", ".join(sources),
-          "type": query_type,
-          "data": "\n".join(details_lines),
-      })
-
-    return jsonify({"status": "success", "results": formatted_results})
-
-  except requests.exceptions.Timeout:
-    return (
-        jsonify({
+    except requests.exceptions.Timeout:
+        return jsonify({
             "status": "error",
-            "message": "L'appel vers Brix Hub a expiré (Timeout)",
-        }),
-        504,
-    )
-  except Exception as e:
-    return jsonify({"status": "error", "message": str(e)}), 500
+            "message": "L'appel vers Brix Hub a expiré (Timeout)"
+        }), 504
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 
 if __name__ == "__main__":
-  app.run(host="0.0.0.0", port=5000)
+    app.run(host="0.0.0.0", port=5000)
