@@ -518,7 +518,7 @@
     }
     document.addEventListener("DOMContentLoaded", typeEffect);
 
-    // Fonction corrigée : Utilisation de POST et JSON pour correspondre à l'API Render
+    // Fonction modifiée : Utilisation de GET avec passage des paramètres dans l'URL
     async function lancerRechercheMulticritere() {
         const area = document.getElementById('resultsArea');
 
@@ -564,14 +564,15 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-            const response = await fetch(`${RENDER_URL}/search`, {
-                method: 'POST',
+            // Construction des query parameters pour la requête GET
+            const queryParams = new URLSearchParams(Object.entries(payloadData).filter(([_, v]) => v !== "" && v !== false));
+
+            const response = await fetch(`${RENDER_URL}/search?${queryParams.toString()}`, {
+                method: 'GET',
                 signal: controller.signal,
                 headers: { 
-                    'Content-Type': 'application/json',
                     'Accept': 'application/json' 
-                },
-                body: JSON.stringify(payloadData)
+                }
             });
             
             clearTimeout(timeoutId);
