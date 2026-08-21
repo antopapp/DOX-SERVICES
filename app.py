@@ -6,8 +6,8 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-# URL officielle de l'API Brix Hub
-BRIX_BASE_URL = "https://api.brixhub.is/api/v1"
+# Nouvelle URL officielle de l'API Brix Hub
+BRIX_BASE_URL = "https://brixhub.to/api/v1"
 
 # Récupération de la clé API depuis les variables d'environnement de Render
 BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "")
