@@ -9,15 +9,16 @@ CORS(app)
 # URLs et configurations
 BRIX_BASE_URL = "https://brixhub.to/api/v1"
 BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "")
-DISCORD_WEBHOOK_URL = os.environ.get("https://discord.com/api/webhooks/1541108116320428183/_P0bDDp7CPQxiaTDTWvE_p92joeeFGb04eGLefoSsBQOjBncFgVBHdQxZxR9GZOfH9n7", "")
+
+# URL du webhook intégrée pour le test (pense à la supprimer/changer après)
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1541108116320428183/_P0bDDp7CPQxiaTDTWvE_p92joeeFGb04eGLefoSsBQOjBncFgVBHdQxZxR9GZOfH9n7"
 
 
 def send_discord_notification(payload_data, user_ip):
     """Envoie un résumé de la recherche effectuée sur le webhook Discord."""
     if not DISCORD_WEBHOOK_URL:
-        return  # Si le webhook n'est pas configuré, on ne fait rien
+        return
 
-    # Formatage propre des critères de recherche pour Discord
     criteria_lines = []
     for key, val in payload_data.items():
         if key not in ["flexible", "per_page"]:
@@ -46,7 +47,6 @@ def home():
 
 @app.route("/search", methods=["GET"])
 def search():
-    # Récupération de tous les paramètres passés dans l'URL par le front-end
     allowed_fields = [
         "nom_famille", "prenom", "nom_naissance", "nom_utilisateur",
         "email", "telephone", "adresse_ip", "discord_id",
@@ -65,15 +65,15 @@ def search():
             "message": "Veuillez renseigner au moins un critère de recherche."
         }), 400
 
-    # Récupération de l'IP (gère les proxys de Render)
+    # Récupération de l'IP
     user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
     if user_ip and "," in user_ip:
         user_ip = user_ip.split(",")[0].strip()
 
-    # Envoi de la notification Discord en arrière-plan (sans bloquer la réponse de l'API)
+    # Envoi de la notification Discord
     send_discord_notification(payload, user_ip)
 
-    # Ajout des options demandées par l'API BrixHub
+    # Options BrixHub
     payload["flexible"] = True
     payload["per_page"] = 15
 
