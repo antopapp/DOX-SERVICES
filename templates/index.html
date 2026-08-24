@@ -379,17 +379,25 @@
             border: 1px solid var(--glass-border);
             border-top: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-buttons-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         button.btn-search {
-            padding: 14px 38px;
+            padding: 14px 28px;
             border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.3);
             background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
             color: #ffffff;
             font-family: var(--font-mono);
             font-weight: 700;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
@@ -398,6 +406,15 @@
         button.btn-search:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 35px rgba(139, 92, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+        }
+
+        button.btn-oathnet {
+            background: linear-gradient(135deg, #06b6d4, #3b82f6);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+        }
+
+        button.btn-oathnet:hover {
+            box-shadow: 0 12px 35px rgba(6, 182, 212, 0.6), 0 0 20px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
         }
 
         #resultsArea {
@@ -631,11 +648,30 @@
                 </div>
             </div>
 
+            <!-- ACCORDÉON 5 (NOUVEAU) : Mots de passe & Adresses Mail -->
+            <div class="accordion-item">
+                <button class="accordion-header" onclick="toggleAccordion(this)">
+                    <span class="accordion-title-left">🔑 Mots de passe & Adresses Mail</span>
+                    <span class="accordion-arrow">▼</span>
+                </button>
+                <div class="accordion-content" style="max-height: 0px;">
+                    <div class="fields-grid">
+                        <div class="field-group">
+                            <label>Requête Mail / Mot de passe</label>
+                            <input type="text" id="oathnet_query" placeholder="Ex: email@domaine.com ou mot de passe" onkeypress="if(event.key === 'Enter') lancerRechercheOathnet()">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         </div>
 
         <div class="action-bar">
-            <button class="btn-search" onclick="lancerRechercheMulticritere()">Lancer la recherche</button>
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">Recherche multicritères active</span>
+            <div class="action-buttons-group">
+                <button class="btn-search" onclick="lancerRechercheMulticritere()">Lancer la recherche</button>
+                <button class="btn-search btn-oathnet" onclick="lancerRechercheOathnet()">MOTS DE PASSE ADRESSE MAIL</button>
+            </div>
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">Modules connectés</span>
         </div>
 
         <div id="resultsArea"></div>
@@ -686,7 +722,7 @@
     }
     document.addEventListener("DOMContentLoaded", typeEffect);
 
-    // Fonction de recherche API
+    // Fonction de recherche API Multicritère existante
     async function lancerRechercheMulticritere() {
         const area = document.getElementById('resultsArea');
 
@@ -793,20 +829,74 @@
                             </div>
                         </div>`;
                 });
-
                 area.innerHTML = htmlResults;
             } else {
-                area.innerHTML = `
-                    <div class="result-card">
-                        <p style="color: var(--text-muted); font-family: var(--font-mono); font-size: 0.9rem; text-align: center;">Aucun résultat trouvé pour ces critères.</p>
-                    </div>`;
+                area.innerHTML = `<div class="result-card"><p style="color: var(--text-muted); font-family: var(--font-mono);">Aucun résultat trouvé pour ces critères.</p></div>`;
             }
-
         } catch (error) {
+            area.innerHTML = `<div class="result-card"><p style="color: #ef4444; font-family: var(--font-mono);">Erreur lors de la requête : ${error.message}</p></div>`;
+        }
+    }
+
+    // Nouvelle fonction pour appeler la route /search-oathnet
+    async function lancerRechercheOathnet() {
+        const area = document.getElementById('resultsArea');
+        const queryVal = document.getElementById('oathnet_query').value.trim();
+
+        if (!queryVal) {
             area.innerHTML = `
                 <div class="result-card">
-                    <p style="color: #ef4444; font-family: var(--font-mono); font-size: 0.9rem;">⚠️ Erreur lors de la requête : ${error.message}</p>
+                    <p style="color: #ef4444; font-family: var(--font-mono); font-size: 0.9rem;">⚠️ Veuillez entrer une valeur dans le champ "Mots de passe & Adresses Mail".</p>
                 </div>`;
+            return;
+        }
+
+        area.innerHTML = `
+            <div class="spinner-container">
+                <div class="spinner"></div>
+                <p style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-mono);">
+                    Interrogation de la base Oathnet...
+                </p>
+            </div>
+        `;
+
+        try {
+            const RENDER_URL = "https://f9um-services.onrender.com"; 
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+            const response = await fetch(`${RENDER_URL}/search-oathnet?query=${encodeURIComponent(queryVal)}`, {
+                method: 'GET',
+                signal: controller.signal,
+                headers: { 'Accept': 'application/json' }
+            });
+            
+            clearTimeout(timeoutId);
+
+            if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
+
+            const data = await response.json();
+
+            if (data.status === 'success' && data.results && data.results.length > 0) {
+                let htmlResults = '';
+                
+                data.results.forEach(item => {
+                    htmlResults += `
+                        <div class="result-card">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;">
+                                <span class="badge" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9; border-color: rgba(6, 182, 212, 0.35);">Module : Oathnet</span>
+                            </div>
+                            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-main); white-space: pre-wrap; word-break: break-all;">
+                                ${item.data || JSON.stringify(item, null, 2)}
+                            </div>
+                        </div>`;
+                });
+                area.innerHTML = htmlResults;
+            } else {
+                area.innerHTML = `<div class="result-card"><p style="color: var(--text-muted); font-family: var(--font-mono);">Aucun résultat trouvé sur Oathnet pour cette requête.</p></div>`;
+            }
+        } catch (error) {
+            area.innerHTML = `<div class="result-card"><p style="color: #ef4444; font-family: var(--font-mono);">Erreur lors de la requête Oathnet : ${error.message}</p></div>`;
         }
     }
 </script>
