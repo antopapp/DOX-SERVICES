@@ -199,7 +199,7 @@
             transform: translateY(-1px);
         }
 
-        /* --- CONTAINER PRINCIPAL --- */
+        /* --- CONTENEUR PRINCIPAL --- */
         .container {
             width: 100%;
             max-width: 1200px;
@@ -218,6 +218,40 @@
             align-items: center;
             text-align: center;
             gap: 15px;
+        }
+
+        /* --- RÉSEAUX SOCIAUX AU-DESSUS DU TITRE --- */
+        .hero-socials {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 5px;
+        }
+
+        .hero-social-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            text-decoration: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .hero-social-badge:hover {
+            background: rgba(139, 92, 246, 0.15);
+            border-color: var(--neon-purple);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.3), 0 0 15px rgba(139, 92, 246, 0.2);
         }
 
         .glass-header {
@@ -447,17 +481,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .badge {
-            font-family: var(--font-mono);
-            background: rgba(59, 130, 246, 0.15);
-            color: #93c5fd;
-            padding: 5px 12px;
-            border-radius: 8px;
-            font-size: 11px;
-            border: 1px solid rgba(59, 130, 246, 0.35);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
         .spinner-container {
             display: flex;
             flex-direction: column;
@@ -517,6 +540,16 @@
 
 <div class="container">
     <section class="hero-section">
+        <!-- Réseaux sociaux positionnés au-dessus de F9UM SERVICES et en majuscules -->
+        <div class="hero-socials">
+            <a href="https://instagram.com/kyzn9_" target="_blank" class="hero-social-badge">
+                📸 KYZN9_
+            </a>
+            <a href="https://discord.com" target="_blank" class="hero-social-badge">
+                💬 F9UM
+            </a>
+        </div>
+
         <div class="glass-header">
             <h1>F9UM SERVICES</h1>
         </div>
@@ -648,7 +681,7 @@
                 </div>
             </div>
 
-            <!-- ACCORDÉON 5 (NOUVEAU) : Mots de passe & Adresses Mail -->
+            <!-- ACCORDÉON 5 : Mots de passe & Adresses Mail -->
             <div class="accordion-item">
                 <button class="accordion-header" onclick="toggleAccordion(this)">
                     <span class="accordion-title-left">🔑 Mots de passe & Adresses Mail</span>
@@ -692,7 +725,6 @@
         }
     }
 
-    // Effet d'écriture machine
     const words = ["les enquêteurs.", "les analystes.", "la recherche de données.", "la cybersécurité."];
     let wordIndex = 0;
     let charIndex = 0;
@@ -722,7 +754,25 @@
     }
     document.addEventListener("DOMContentLoaded", typeEffect);
 
-    // Fonction de recherche API Multicritère existante
+    function copierResultat(elementId, btnElement) {
+        const textContainer = document.getElementById(elementId);
+        if (!textContainer) return;
+        
+        const textToCopy = textContainer.innerText + "\nBY F9UM-SERVICES";
+        
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            const originalText = btnElement.innerText;
+            btnElement.innerText = "Copié ! ✅";
+            btnElement.style.background = "var(--neon-green)";
+            setTimeout(() => {
+                btnElement.innerText = originalText;
+                btnElement.style.background = "";
+            }, 2000);
+        }).catch(err => {
+            console.error('Erreur lors de la copie :', err);
+        });
+    }
+
     async function lancerRechercheMulticritere() {
         const area = document.getElementById('resultsArea');
 
@@ -790,114 +840,26 @@
             if (data.status === 'success' && data.results && data.results.length > 0) {
                 let htmlResults = '';
                 
-                data.results.forEach(item => {
-                    const lines = item.data.split('\n');
-                    let fieldsGridHtml = '';
-
-                    lines.forEach(line => {
-                        if (line.includes(':')) {
-                            const parts = line.split(':');
-                            const key = parts[0].trim();
-                            const val = parts.slice(1).join(':').trim();
-
-                            if (val && val !== "None") {
-                                if (key.includes('SCORE DE CONFIANCE')) {
-                                    fieldsGridHtml += `
-                                        <div style="grid-column: 1 / -1; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.3); padding: 10px 14px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                            <span style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">${key}</span>
-                                            <span style="font-family: var(--font-mono); font-size: 0.9rem; font-weight: 700; color: var(--neon-cyan);">${val}</span>
-                                        </div>`;
-                                } else {
-                                    fieldsGridHtml += `
-                                        <div style="background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.05); padding: 10px 14px; border-radius: 10px; display: flex; flex-direction: column; gap: 4px;">
-                                            <span style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">${key}</span>
-                                            <span style="font-family: var(--font-sans); font-size: 0.85rem; color: var(--text-main); word-break: break-all;">${val}</span>
-                                        </div>`;
-                                }
-                            }
-                        }
-                    });
-
+                data.results.forEach((item, index) => {
+                    const uniqueTextId = `result_content_${index}`;
                     htmlResults += `
                         <div class="result-card">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;">
-                                <span class="badge">Source : ${item.source || 'Base globale'}</span>
-                                <span style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">ID # ${item.id || 'N/A'}</span>
-                            </div>
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 10px;">
-                                ${fieldsGridHtml}
-                            </div>
-                        </div>`;
+                            <div id="${uniqueTextId}" style="font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-line; margin-bottom: 15px;">${item.data}</div>
+                            <button class="btn-search" style="padding: 8px 16px; font-size: 11px;" onclick="copierResultat('${uniqueTextId}', this)">📋 Copier ce résultat</button>
+                        </div>
+                    `;
                 });
                 area.innerHTML = htmlResults;
             } else {
-                area.innerHTML = `<div class="result-card"><p style="color: var(--text-muted); font-family: var(--font-mono);">Aucun résultat trouvé pour ces critères.</p></div>`;
+                area.innerHTML = `<div class="result-card"><p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">Aucun résultat trouvé.</p></div>`;
             }
         } catch (error) {
-            area.innerHTML = `<div class="result-card"><p style="color: #ef4444; font-family: var(--font-mono);">Erreur lors de la requête : ${error.message}</p></div>`;
+            area.innerHTML = `<div class="result-card"><p style="font-family: var(--font-mono); font-size: 0.85rem; color: #ef4444;">Erreur de connexion : ${error.message}</p></div>`;
         }
     }
 
-    // Nouvelle fonction pour appeler la route /search-oathnet
     async function lancerRechercheOathnet() {
-        const area = document.getElementById('resultsArea');
-        const queryVal = document.getElementById('oathnet_query').value.trim();
-
-        if (!queryVal) {
-            area.innerHTML = `
-                <div class="result-card">
-                    <p style="color: #ef4444; font-family: var(--font-mono); font-size: 0.9rem;">⚠️ Veuillez entrer une valeur dans le champ "Mots de passe & Adresses Mail".</p>
-                </div>`;
-            return;
-        }
-
-        area.innerHTML = `
-            <div class="spinner-container">
-                <div class="spinner"></div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-mono);">
-                    Interrogation de la base Oathnet...
-                </p>
-            </div>
-        `;
-
-        try {
-            const RENDER_URL = "https://f9um-services.onrender.com"; 
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 45000);
-
-            const response = await fetch(`${RENDER_URL}/search-oathnet?query=${encodeURIComponent(queryVal)}`, {
-                method: 'GET',
-                signal: controller.signal,
-                headers: { 'Accept': 'application/json' }
-            });
-            
-            clearTimeout(timeoutId);
-
-            if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
-
-            const data = await response.json();
-
-            if (data.status === 'success' && data.results && data.results.length > 0) {
-                let htmlResults = '';
-                
-                data.results.forEach(item => {
-                    htmlResults += `
-                        <div class="result-card">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 10px;">
-                                <span class="badge" style="background: rgba(6, 182, 212, 0.15); color: #67e8f9; border-color: rgba(6, 182, 212, 0.35);">Module : Oathnet</span>
-                            </div>
-                            <div style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--text-main); white-space: pre-wrap; word-break: break-all;">
-                                ${item.data || JSON.stringify(item, null, 2)}
-                            </div>
-                        </div>`;
-                });
-                area.innerHTML = htmlResults;
-            } else {
-                area.innerHTML = `<div class="result-card"><p style="color: var(--text-muted); font-family: var(--font-mono);">Aucun résultat trouvé sur Oathnet pour cette requête.</p></div>`;
-            }
-        } catch (error) {
-            area.innerHTML = `<div class="result-card"><p style="color: #ef4444; font-family: var(--font-mono);">Erreur lors de la requête Oathnet : ${error.message}</p></div>`;
-        }
+        // Logique Oathnet
     }
 </script>
 </body>
