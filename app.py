@@ -12,7 +12,7 @@ CORS(app)
 BRIX_BASE_URL = "https://brixhub.to/api/v1"
 BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "")
 
-# Webhook Discord (pense à le supprimer après les tests)
+# Webhook Discord
 DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1541108116320428183/_P0bDDp7CPQxiaTDTWvE_p92joeeFGb04eGLefoSsBQOjBncFgVBHdQxZxR9GZOfH9n7"
 
 # Configurations pour l'e-mail
@@ -20,12 +20,14 @@ SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 465
 SENDER_EMAIL = "zazaf9u@gmail.com"
 RECEIVER_EMAIL = "zazaf9u@gmail.com"
-SENDER_PASSWORD = "evrh nrmg hicm qdta"
+# Remplace la chaîne vide par ton mot de passe d'application de 16 caractères entre guillemets
+SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD", "TON_MOT_DE_PASSE_APPLICATION_16_CARACTERES")
 
 
 def send_email_notification(payload_data, user_ip):
     """Envoie un e-mail récapitulatif de la recherche."""
-    if not SENDER_PASSWORD:
+    if not SENDER_PASSWORD or SENDER_PASSWORD == "TON_MOT_DE_PASSE_APPLICATION_16_CARACTERES":
+        print("Mot de passe d'application manquant pour l'e-mail.")
         return
 
     criteria_lines = []
