@@ -61,8 +61,6 @@ def search_oathnet():
             "message": "Veuillez renseigner un terme ou une adresse e-mail pour OathNet."
         }), 400
 
-    # ... la suite de ton code pour interroger https://oathnet.org/ ...
-
     query = query.strip()
 
     # Récupération de l'IP
@@ -73,9 +71,12 @@ def search_oathnet():
     # Notification Discord
     send_discord_notification(query, user_ip, search_type="OathNet (Breach)")
 
+    # Ajout des headers incluant l'User-Agent pour éviter le blocage 403
     headers = {
         "x-api-key": OATHNET_API_KEY,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
     }
 
     try:
