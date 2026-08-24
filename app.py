@@ -53,13 +53,15 @@ def home():
 # Nouvelle route pour intégrer la recherche OathNet (Breach / Leaks)
 @app.route("/search-oathnet", methods=["GET"])
 def search_oathnet():
-    query = request.args.get("q")
+    query = request.args.get("query") or request.args.get("q")
 
     if not query:
         return jsonify({
             "status": "error",
             "message": "Veuillez renseigner un terme ou une adresse e-mail pour OathNet."
         }), 400
+
+    # ... la suite de ton code pour interroger https://oathnet.org/ ...
 
     query = query.strip()
 
