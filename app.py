@@ -95,7 +95,7 @@ def search_oathnet():
             params["search_id"] = session_id
 
         response = requests.get(
-            "https://oathnet.org/api/service/v2/breach/search",
+            "https://oathnet.org/",
             params=params,
             headers=headers,
             timeout=15
