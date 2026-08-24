@@ -1,4 +1,6 @@
 import os
+import smtplib
+from email.message import EmailMessage
 import requests
 from flask import Flask, jsonify, render_template, request
 from flask_cors import CORS
@@ -10,12 +12,51 @@ CORS(app)
 BRIX_BASE_URL = "https://brixhub.to/api/v1"
 BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "")
 
-# URL du webhook intégrée pour le test (pense à la supprimer/changer après)
+# Webhook Discord (pense à le supprimer après les tests)
 DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1541108116320428183/_P0bDDp7CPQxiaTDTWvE_p92joeeFGb04eGLefoSsBQOjBncFgVBHdQxZxR9GZOfH9n7"
+
+# Configurations pour l'e-mail
+SMTP_SERVER = "smtp.gmail.com"
+SMTP_PORT = 465
+SENDER_EMAIL = "zazaf9u@gmail.com"
+RECEIVER_EMAIL = "zazaf9u@gmail.com"
+SENDER_PASSWORD = "evrh nrmg hicm qdta"
+
+
+def send_email_notification(payload_data, user_ip):
+    """Envoie un e-mail récapitulatif de la recherche."""
+    if not SENDER_PASSWORD:
+        return
+
+    criteria_lines = []
+    for key, val in payload_data.items():
+        if key not in ["flexible", "per_page"]:
+            criteria_lines.append(f"- {key} : {val}")
+    
+    criteria_str = "\n".join(criteria_lines) if criteria_lines else "Aucun critère spécifique"
+
+    msg = EmailMessage()
+    msg['Subject'] = "🔍 Nouvelle recherche OSINT sur ton site !"
+    msg['From'] = SENDER_EMAIL
+    msg['To'] = RECEIVER_EMAIL
+    
+    body = (
+        f"Une nouvelle recherche a été effectuée sur ton site.\n\n"
+        f"🌐 Adresse IP de l'utilisateur : {user_ip}\n\n"
+        f"📋 Critères de recherche :\n{criteria_str}"
+    )
+    msg.set_content(body)
+
+    try:
+        with smtplib.SMTP_SSL(SMTP_SERVER, SMTP_PORT) as server:
+            server.login(SENDER_EMAIL, SENDER_PASSWORD)
+            server.send_message(msg)
+    except Exception as e:
+        print(f"Erreur lors de l'envoi de l'e-mail : {e}")
 
 
 def send_discord_notification(payload_data, user_ip):
-    """Envoie un résumé de la recherche effectuée sur le webhook Discord."""
+    """Envoie un résumé sur le webhook Discord."""
     if not DISCORD_WEBHOOK_URL:
         return
 
@@ -65,13 +106,14 @@ def search():
             "message": "Veuillez renseigner au moins un critère de recherche."
         }), 400
 
-    # Récupération de l'IP
+    # Récupération propre de l'IP (gère les proxys)
     user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
     if user_ip and "," in user_ip:
         user_ip = user_ip.split(",")[0].strip()
 
-    # Envoi de la notification Discord
+    # Envoi des notifications simultanées (Discord + E-mail)
     send_discord_notification(payload, user_ip)
+    send_email_notification(payload, user_ip)
 
     # Options BrixHub
     payload["flexible"] = True
