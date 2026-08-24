@@ -12,22 +12,20 @@ CORS(app)
 BRIX_BASE_URL = "https://brixhub.to/api/v1"
 BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "")
 
-# Webhook Discord
+# Webhook (tu pourras le remettre dans le .env plus tard)
 DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1541108116320428183/_P0bDDp7CPQxiaTDTWvE_p92joeeFGb04eGLefoSsBQOjBncFgVBHdQxZxR9GZOfH9n7"
 
-# Configurations pour l'e-mail
+# Configurations pour l'envoi d'e-mails (à stocker aussi dans tes variables d'environnement sur Render)
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 465
-SENDER_EMAIL = "zazaf9u@gmail.com"
-RECEIVER_EMAIL = "zazaf9u@gmail.com"
-# Remplace la chaîne vide par ton mot de passe d'application de 16 caractères entre guillemets
-SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD", "TON_MOT_DE_PASSE_APPLICATION_16_CARACTERES")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL", "ton.email@gmail.com")       # Ton email
+SENDER_PASSWORD = os.environ.get("SENDER_PASSWORD", "ton_mot_de_passe_app") # Mot de passe d'application
+RECEIVER_EMAIL = os.environ.get("RECEIVER_EMAIL", "ton.email@gmail.com")   # L'email où tu veux recevoir l'alerte
 
 
 def send_email_notification(payload_data, user_ip):
     """Envoie un e-mail récapitulatif de la recherche."""
-    if not SENDER_PASSWORD or SENDER_PASSWORD == "TON_MOT_DE_PASSE_APPLICATION_16_CARACTERES":
-        print("Mot de passe d'application manquant pour l'e-mail.")
+    if not SENDER_EMAIL or not SENDER_PASSWORD:
         return
 
     criteria_lines = []
@@ -38,14 +36,14 @@ def send_email_notification(payload_data, user_ip):
     criteria_str = "\n".join(criteria_lines) if criteria_lines else "Aucun critère spécifique"
 
     msg = EmailMessage()
-    msg['Subject'] = "🔍 Nouvelle recherche OSINT sur ton site !"
+    msg['Subject'] = "🔍 Nouvelle recherche OSINT effectuée !"
     msg['From'] = SENDER_EMAIL
     msg['To'] = RECEIVER_EMAIL
     
     body = (
-        f"Une nouvelle recherche a été effectuée sur ton site.\n\n"
-        f"🌐 Adresse IP de l'utilisateur : {user_ip}\n\n"
-        f"📋 Critères de recherche :\n{criteria_str}"
+        f"Une nouvelle recherche a été lancée sur ton site.\n\n"
+        f"Adresse IP de l'utilisateur : {user_ip}\n\n"
+        f"Critères de recherche :\n{criteria_str}"
     )
     msg.set_content(body)
 
@@ -108,12 +106,12 @@ def search():
             "message": "Veuillez renseigner au moins un critère de recherche."
         }), 400
 
-    # Récupération propre de l'IP (gère les proxys)
+    # Récupération propre de l'IP
     user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
     if user_ip and "," in user_ip:
         user_ip = user_ip.split(",")[0].strip()
 
-    # Envoi des notifications simultanées (Discord + E-mail)
+    # Envoi des notifications (Discord + E-mail) en même temps
     send_discord_notification(payload, user_ip)
     send_email_notification(payload, user_ip)
 
