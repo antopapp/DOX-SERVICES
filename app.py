@@ -13,7 +13,7 @@ BRIX_API_KEY = os.environ.get("BRIX_API_KEY", "")
 # Configuration de la clé API OathNet depuis les variables d'environnement Render
 OATHNET_API_KEY = os.environ.get("OATHNET_API_KEY", "")
 
-# URL du webhook intégrée pour le test (pense à la supprimer/changer après)
+# URL du webhook intégrée pour le test
 DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1541108116320428183/_P0bDDp7CPQxiaTDTWvE_p92joeeFGb04eGLefoSsBQOjBncFgVBHdQxZxR9GZOfH9n7"
 
 
@@ -50,7 +50,7 @@ def home():
     return render_template("index.html")
 
 
-# Nouvelle route pour intégrer la recherche OathNet (Breach / Leaks)
+# Route dédiée à la recherche de brèches OathNet (API V2 officielle)
 @app.route("/search-oathnet", methods=["GET"])
 def search_oathnet():
     query = request.args.get("query") or request.args.get("q")
@@ -69,37 +69,19 @@ def search_oathnet():
         user_ip = user_ip.split(",")[0].strip()
 
     # Notification Discord
-    send_discord_notification(query, user_ip, search_type="OathNet (Breach)")
+    send_discord_notification(query, user_ip, search_type="OathNet (Breach V2)")
 
-    # Ajout des headers incluant l'User-Agent pour éviter le blocage 403
     headers = {
         "x-api-key": OATHNET_API_KEY,
         "Content-Type": "application/json",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
     }
 
     try:
-        # 1. Initialisation d'une session de recherche OathNet (pour économiser les quotas)
-        session_resp = requests.post(
-            "https://oathnet.org/api/service/search/init",
-            json={"query": query, "search_type": "auto"},
-            headers=headers,
-            timeout=10
-        ).json()
-
-        session_id = None
-        if session_resp.get("success"):
-            session_id = session_resp.get("data", {}).get("session", {}).get("id")
-
-        # 2. Requête vers l'endpoint de recherche de brèches v2
-        params = {"q": query}
-        if session_id:
-            params["search_id"] = session_id
-
+        # Requête vers le bon endpoint V2 de recherche de brèches
         response = requests.get(
-            "https://oathnet.org/",
-            params=params,
+            "https://oathnet.org/api/service/v2/breach/search",
+            params={"q": query},
             headers=headers,
             timeout=15
         )
@@ -111,6 +93,14 @@ def search_oathnet():
             }), response.status_code
 
         oath_data = response.json()
+        
+        # Vérification du succès et extraction des items selon la structure de la doc
+        if not oath_data.get("success", False):
+            return jsonify({
+                "status": "error",
+                "message": oath_data.get("message", "Erreur renvoyée par OathNet")
+            }), 400
+
         items = oath_data.get("data", {}).get("items", [])
 
         formatted_results = []
@@ -118,19 +108,23 @@ def search_oathnet():
             email = item.get("email", "N/A")
             password = item.get("password", "***REDACTED***")
             dbname = item.get("dbname", "Base inconnue")
-            indexed_at = item.get("indexed_at", "N/A")
+            username = item.get("username", "")
+            country = item.get("country", "")
 
-            details_str = (
-                f"EMAIL : {email}\n"
-                f"MOT DE PASSE : {password}\n"
-                f"SOURCE (DB) : {dbname}\n"
-                f"INDEXÉ LE : {indexed_at}"
-            )
+            details_lines = [
+                f"EMAIL : {email}",
+                f"MOT DE PASSE : {password}",
+                f"SOURCE (DB) : {dbname}"
+            ]
+            if username:
+                details_lines.insert(1, f"USERNAME : {username}")
+            if country:
+                details_lines.append(f"PAYS : {country}")
 
             formatted_results.append({
                 "source": f"OathNet ({dbname})",
                 "type": "BREACH",
-                "data": details_str,
+                "data": "\n".join(details_lines),
             })
 
         return jsonify({"status": "success", "results": formatted_results})
@@ -164,15 +158,12 @@ def search():
             "message": "Veuillez renseigner au moins un critère de recherche."
         }), 400
 
-    # Récupération de l'IP
     user_ip = request.headers.get("X-Forwarded-For", request.remote_addr)
     if user_ip and "," in user_ip:
         user_ip = user_ip.split(",")[0].strip()
 
-    # Envoi de la notification Discord
     send_discord_notification(payload, user_ip, search_type="BrixHub OSINT")
 
-    # Options BrixHub
     payload["flexible"] = True
     payload["per_page"] = 15
 
