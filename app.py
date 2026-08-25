@@ -165,7 +165,7 @@ def search():
     send_discord_notification(payload, user_ip, search_type="BrixHub OSINT")
 
     payload["flexible"] = True
-    payload["per_page"] = 15
+    payload["per_page"] = 100
 
     headers = {
         "X-API-Key": BRIX_API_KEY,
