@@ -1,297 +1,404 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>F9UM SERVICES | OSINT Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>F9UM SERVICES // Enterprise OSINT & Global Intelligence Platform</title>
+    <meta name="description" content="Plateforme OSINT de référence pour le croisement intelligent de données à grande échelle. Indexation globale et temps de réponse inférieur à 100 ms.">
     
+    <!-- Polices Google Fonts de haute qualité -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Styles CSS combinés et modulaires -->
     <style>
         :root {
-            --bg-dark: #000000;
-            --glass-bg: rgba(20, 20, 30, 0.65);
-            --glass-card: rgba(12, 12, 18, 0.75);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-border-hover: rgba(139, 92, 246, 0.4);
+            --bg-base: #02040a;
+            --bg-surface: #0a0f1d;
+            --bg-card: rgba(13, 20, 38, 0.75);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-hover: rgba(59, 130, 246, 0.4);
+            --primary: #3b82f6;
+            --primary-glow: rgba(59, 130, 246, 0.35);
+            --accent: #06b6d4;
+            --accent-glow: rgba(6, 182, 212, 0.35);
+            --success: #10b981;
+            --warning: #f59e0b;
             --neon-purple: #8b5cf6;
-            --neon-blue: #3b82f6;
             --neon-cyan: #06b6d4;
             --neon-green: #10b981;
             --text-main: #f8fafc;
-            --text-muted: #a1a1aa;
-            --font-sans: 'Inter', system-ui, sans-serif;
+            --text-muted: #94a3b8;
+            --text-dim: #64748b;
+            --font-sans: 'Plus Jakarta Sans', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #000000; }
-        ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--neon-purple); }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-
-        body {
-            background-color: #0f1117;
-            background-image: linear-gradient(rgba(15, 17, 23, 0.85), rgba(15, 17, 23, 0.85)), url('https://raw.githubusercontent.com/antopapp/DOX-SERVICES/main/renderimage.gif');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-            background-repeat: no-repeat;
-            
-            color: var(--text-main);
-            font-family: var(--font-sans);
-            min-height: 100vh;
-            overflow-x: hidden;
-            position: relative;
+        /* Reset & Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
         }
 
-        body::after {
-            content: '';
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: linear-gradient(rgba(2, 4, 10, 0.85), rgba(2, 4, 10, 0.85)), url('https://raw.githubusercontent.com/antopapp/DOX-SERVICES/main/renderimage.gif');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Toile de fond animée (Canvas) */
+        #bg-canvas {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: -1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
             pointer-events: none;
         }
 
-        /* --- TOP NAVBAR --- */
-        .top-navbar {
-            width: 100%;
-            background: rgba(10, 10, 15, 0.8);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            padding: 12px 30px;
+        /* Grille décorative d'arrière-plan */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Layout Global */
+        .app-container {
+            position: relative;
+            z-index: 2;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 24px;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* En-tête / Navbar */
+        header {
+            display: flex;
             justify-content: space-between;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-        }
-
-        .nav-left {
-            display: flex;
             align-items: center;
-            gap: 25px;
-            overflow-x: auto;
-            white-space: nowrap;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 40px;
         }
 
-        .brand-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: var(--font-mono);
-            font-weight: 700;
-            font-size: 1rem;
-            color: #ffffff;
-            text-decoration: none;
-        }
-
-        .brand-logo svg {
-            color: var(--neon-cyan);
-            filter: drop-shadow(0 0 10px rgba(6, 182, 212, 0.8));
-        }
-
-        .nav-links {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .nav-item {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 14px;
-            border-radius: 10px;
-            color: var(--text-muted);
-            font-size: 0.85rem;
-            font-weight: 500;
-            text-decoration: none;
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            transition: all 0.25s ease;
-        }
-
-        .nav-item:hover {
-            color: var(--text-main);
-            background: rgba(255, 255, 255, 0.05);
-            transform: translateY(-1px);
-        }
-
-        .nav-item.active {
-            background: rgba(255, 255, 255, 0.08);
-            color: #ffffff;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .nav-right {
+        .brand {
             display: flex;
             align-items: center;
             gap: 12px;
+            text-decoration: none;
         }
 
-        .nav-badge {
+        .brand-logo {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px var(--primary-glow);
+        }
+
+        .brand-logo svg {
+            width: 22px;
+            height: 22px;
+            fill: #ffffff;
+        }
+
+        .brand-name {
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        .brand-name span {
+            color: var(--primary);
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+
+        .status-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 14px;
+            border-radius: 50px;
             font-family: var(--font-mono);
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            padding: 6px 12px;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-        }
-
-        .green-dot {
-            width: 7px;
-            height: 7px;
-            background-color: var(--neon-green);
-            border-radius: 50%;
-            display: inline-block;
-            box-shadow: 0 0 8px var(--neon-green);
-            animation: slowPulse 2.5s infinite ease-in-out;
-        }
-
-        @keyframes slowPulse {
-            0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--neon-green); }
-            50% { opacity: 0.25; transform: scale(0.85); box-shadow: 0 0 2px var(--neon-green); }
+            font-size: 12px;
+            color: #34d399;
         }
 
         .wallet-badge {
-            background: rgba(139, 92, 246, 0.08);
-            border-color: rgba(139, 92, 246, 0.25);
-            color: var(--text-main);
+            background: rgba(139, 92, 246, 0.1);
+            border: 1px solid rgba(139, 92, 246, 0.3);
+            color: #c084fc;
+            padding: 6px 14px;
+            border-radius: 50px;
             font-family: var(--font-mono);
-            font-size: 0.8rem;
+            font-size: 12px;
         }
 
         .social-chip {
-            padding: 6px 12px;
-            border-radius: 10px;
+            padding: 6px 14px;
+            border-radius: 50px;
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--border-color);
             color: var(--text-main);
-            font-size: 0.8rem;
+            font-size: 12px;
+            font-family: var(--font-mono);
             display: inline-flex;
             align-items: center;
             gap: 6px;
             text-decoration: none;
-            transition: all 0.25s ease;
+            transition: var(--transition);
         }
 
         .social-chip:hover {
             background: rgba(255, 255, 255, 0.07);
-            border-color: rgba(255, 255, 255, 0.15);
-            transform: translateY(-1px);
+            border-color: var(--border-hover);
         }
 
-        /* --- CONTENEUR PRINCIPAL --- */
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
+            background-color: var(--success);
+            border-radius: 50%;
+            box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
         }
 
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.6); opacity: 0.4; }
+        }
+
+        /* Section Hero principale */
         .hero-section {
-            min-height: 35vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 50px;
             align-items: center;
-            text-align: center;
-            gap: 15px;
+            padding: 20px 0 60px 0;
         }
 
-        /* --- RÉSEAUX SOCIAUX AU-DESSUS DU TITRE --- */
+        @media (max-width: 968px) {
+            .hero-section {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+        }
+
         .hero-socials {
             display: flex;
             gap: 12px;
-            margin-bottom: 5px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 968px) {
+            .hero-socials { justify-content: center; }
         }
 
         .hero-social-badge {
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 16px;
-            border-radius: 12px;
+            padding: 6px 14px;
+            border-radius: 10px;
             background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.12);
             color: var(--text-main);
             font-family: var(--font-mono);
-            font-size: 0.85rem;
+            font-size: 12px;
             font-weight: 700;
             text-transform: uppercase;
             text-decoration: none;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: var(--transition);
         }
 
         .hero-social-badge:hover {
             background: rgba(139, 92, 246, 0.15);
             border-color: var(--neon-purple);
             transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.3), 0 0 15px rgba(139, 92, 246, 0.2);
         }
 
-        .glass-header {
-            padding: 24px 55px;
-            border-radius: 22px;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01));
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .glass-header h1 {
-            font-family: var(--font-mono);
-            font-size: 2.3rem;
+        .hero-content h1 {
+            font-size: clamp(32px, 4vw, 50px);
             font-weight: 800;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: #ffffff;
-            text-shadow: 0 0 20px rgba(139, 92, 246, 0.7);
+            line-height: 1.1;
+            letter-spacing: -1px;
+            margin-bottom: 20px;
+            background: linear-gradient(to right, #ffffff, #93c5fd, #67e8f9);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
-        .typing-container {
-            font-size: 1.05rem;
+        .hero-content p {
+            font-size: 16px;
             color: var(--text-muted);
-            font-weight: 500;
+            margin-bottom: 30px;
+            line-height: 1.7;
+            max-width: 600px;
+        }
+
+        @media (max-width: 968px) {
+            .hero-content p { margin: 0 auto 30px auto; }
         }
 
         .typed-text {
             color: var(--neon-cyan);
             font-family: var(--font-mono);
             font-weight: 700;
-            text-shadow: 0 0 10px rgba(6, 182, 212, 0.4);
         }
 
-        /* --- ACCORDÉONS --- */
+        /* Boîte interactive / Terminal Widget */
+        .interactive-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 25px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .widget-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 12px;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: 13px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 6px;
+            transition: var(--transition);
+        }
+
+        .tab-btn.active {
+            background: rgba(59, 130, 246, 0.15);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .terminal-screen {
+            background: #020617;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 16px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            color: #38bdf8;
+            height: 160px;
+            overflow-y: auto;
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .terminal-line {
+            margin-bottom: 8px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .terminal-prompt {
+            color: var(--success);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .metric-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: left;
+        }
+
+        .metric-value {
+            font-family: var(--font-mono);
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 4px;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* --- ACCORDÉONS DE RECHERCHE --- */
         .search-section {
             width: 100%;
-            padding-top: 10px;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 30px auto;
+        }
+
+        .section-header h2 {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 15px;
         }
 
         .search-builder {
@@ -303,54 +410,50 @@
         }
 
         .accordion-item {
-            background: var(--glass-card);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
+            border: 1px solid var(--border-color);
             border-top: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+            transition: var(--transition);
         }
 
         .accordion-item:hover {
-            border-color: var(--glass-border-hover);
-            box-shadow: 0 16px 50px rgba(0, 0, 0, 0.7), 0 0 20px rgba(139, 92, 246, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            border-color: var(--border-hover);
         }
 
         .accordion-header {
             width: 100%;
-            padding: 20px 24px;
+            padding: 18px 24px;
             background: transparent;
             border: none;
             color: var(--text-main);
             font-family: var(--font-sans);
-            font-size: 0.95rem;
+            font-size: 15px;
             font-weight: 600;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            user-select: none;
         }
 
         .accordion-title-left {
             display: flex;
             align-items: center;
             gap: 10px;
-            color: var(--text-main);
         }
 
         .accordion-arrow {
             color: var(--text-muted);
-            font-size: 0.85rem;
+            font-size: 12px;
             transition: transform 0.3s ease;
         }
 
         .accordion-item.active .accordion-arrow {
             transform: rotate(180deg);
-            color: var(--neon-purple);
+            color: var(--primary);
         }
 
         .accordion-content {
@@ -374,7 +477,7 @@
         }
 
         .field-group label {
-            font-size: 0.75rem;
+            font-size: 11px;
             color: var(--text-muted);
             font-family: var(--font-mono);
             text-transform: uppercase;
@@ -382,21 +485,21 @@
 
         input[type="text"] {
             width: 100%;
-            padding: 13px 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(4, 4, 8, 0.7);
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: rgba(2, 6, 23, 0.7);
             color: var(--text-main);
             font-size: 13px;
+            font-family: var(--font-sans);
             outline: none;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
-            transition: all 0.3s ease;
+            transition: var(--transition);
         }
 
         input[type="text"]:focus {
-            border-color: var(--neon-purple);
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 15px rgba(139, 92, 246, 0.35);
-            background: rgba(8, 8, 15, 0.9);
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+            background: rgba(2, 6, 23, 0.9);
         }
 
         .action-bar {
@@ -405,14 +508,11 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 30px;
-            background: var(--glass-card);
+            background: var(--bg-card);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             padding: 18px 24px;
             border-radius: 16px;
-            border: 1px solid var(--glass-border);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-color);
             gap: 15px;
             flex-wrap: wrap;
         }
@@ -424,31 +524,30 @@
         }
 
         button.btn-search {
-            padding: 14px 28px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
-            color: #ffffff;
-            font-family: var(--font-mono);
-            font-weight: 700;
-            font-size: 13px;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 600;
+            padding: 12px 24px;
+            border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            border: none;
+            background: linear-gradient(135deg, var(--primary), #2563eb);
+            color: #ffffff;
+            box-shadow: 0 10px 25px var(--primary-glow);
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
         }
 
         button.btn-search:hover {
             transform: translateY(-2px);
-            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.6), 0 0 20px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            box-shadow: 0 15px 35px rgba(59, 130, 246, 0.5);
         }
 
         button.btn-oathnet {
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
-            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-        }
-
-        button.btn-oathnet:hover {
-            box-shadow: 0 12px 35px rgba(6, 182, 212, 0.6), 0 0 20px rgba(59, 130, 246, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            box-shadow: 0 10px 25px var(--accent-glow);
         }
 
         #resultsArea {
@@ -456,28 +555,21 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
+            margin-bottom: 40px;
         }
 
         .result-card {
-            background: var(--glass-card);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-top: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
             padding: 24px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.06);
-            animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-            transition: transform 0.3s ease, border-color 0.3s ease;
-        }
-
-        .result-card:hover {
-            border-color: rgba(139, 92, 246, 0.3);
-            transform: translateY(-2px);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            animation: fadeInUp 0.4s ease forwards;
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
@@ -490,377 +582,598 @@
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(139, 92, 246, 0.2);
+            width: 35px;
+            height: 35px;
+            border: 3px solid rgba(59, 130, 246, 0.2);
             border-radius: 50%;
-            border-top-color: var(--neon-cyan);
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+            border-top-color: var(--accent);
             animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Section FAQ */
+        .faq-section {
+            padding: 40px 0;
+            border-top: 1px solid var(--border-color);
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .faq-question {
+            padding: 18px 20px;
+            font-weight: 600;
+            font-size: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .faq-answer {
+            padding: 0 20px 20px 20px;
+            color: var(--text-muted);
+            font-size: 14px;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .faq-item.open .faq-answer {
+            display: block;
+        }
+
+        /* Pied de page */
+        footer {
+            margin-top: auto;
+            padding: 30px 0;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            color: var(--text-dim);
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: #ffffff;
+        }
+
+        .tor-notice {
+            font-family: var(--font-mono);
+            color: var(--accent);
+            background: rgba(6, 182, 212, 0.08);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            padding: 6px 14px;
+            border-radius: 8px;
+        }
     </style>
 </head>
 <body>
 
-<!-- BARRE DE NAVIGATION SUPÉRIEURE -->
-<header class="top-navbar">
-    <div class="nav-left">
-        <a href="#" class="brand-logo">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-            F9UM Services
-        </a>
-        <nav class="nav-links">
-            <button class="nav-item">🏠 Accueil</button>
-            <button class="nav-item active">🔍 Recherche</button>
-            <button class="nav-item">💻 API</button>
-            <button class="nav-item">🗑️ Suppression</button>
-        </nav>
-    </div>
+    <!-- Toile de fond animée par script -->
+    <canvas id="bg-canvas"></canvas>
+    <div class="bg-grid"></div>
 
-    <div class="nav-right">
-        <div class="nav-badge">
-            <span class="green-dot"></span>
-            11 102 943 233
-        </div>
-        <div class="nav-badge wallet-badge">
-            💳 0,00 €
-        </div>
-        <a href="#" class="social-chip">
-            ✈️ Telegram
-        </a>
-        <a href="#" class="social-chip">
-            💬 68 409
-        </a>
-    </div>
-</header>
-
-<div class="container">
-    <section class="hero-section">
-        <!-- Réseaux sociaux positionnés au-dessus de F9UM SERVICES et en majuscules -->
-        <div class="hero-socials">
-            <a href="https://instagram.com/kyzn9_" target="_blank" class="hero-social-badge">
-                📸 KYZN9_
+    <div class="app-container">
+        
+        <!-- En-tête / Navbar -->
+        <header>
+            <a href="#" class="brand">
+                <div class="brand-logo">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                    </svg>
+                </div>
+                <div class="brand-name">F9UM<span>_SERVICES</span></div>
             </a>
-            <a href="https://discord.com" target="_blank" class="hero-social-badge">
-                💬 F9UM
-            </a>
-        </div>
-
-        <div class="glass-header">
-            <h1>F9UM SERVICES</h1>
-        </div>
-        <div class="typing-container">
-            Plateforme OSINT pour <span class="typed-text" id="typewriter"></span>
-        </div>
-    </section>
-
-    <section id="searchSection" class="search-section">
-        <div class="search-builder">
             
-            <!-- ACCORDÉON 1 : Identité -->
-            <div class="accordion-item active">
-                <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-title-left">👤 Identité</span>
-                    <span class="accordion-arrow">▼</span>
-                </button>
-                <div class="accordion-content" style="max-height: 400px;">
-                    <div class="fields-grid">
-                        <div class="field-group">
-                            <label>Nom</label>
-                            <input type="text" id="nom_famille" placeholder="Ex: Dupont" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Prénom</label>
-                            <input type="text" id="prenom" placeholder="Ex: Jean" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Nom de naissance</label>
-                            <input type="text" id="nom_naissance" placeholder="Ex: Martin" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Nom affiché</label>
-                            <input type="text" id="nom_affiche" placeholder="Ex: Jean Dupont" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Genre</label>
-                            <input type="text" id="genre" placeholder="Ex: M / F" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Nom d'utilisateur</label>
-                            <input type="text" id="nom_utilisateur" placeholder="Ex: Pseudo123" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
+            <div class="nav-actions">
+                <div class="status-badge">
+                    <div class="pulse-dot"></div>
+                    Système Opérationnel
+                </div>
+                <div class="wallet-badge">💳 0,00 €</div>
+                <a href="https://t.me" target="_blank" class="social-chip">✈️ Telegram</a>
+                <a href="https://discord.com" target="_blank" class="social-chip">💬 68 409</a>
+            </div>
+        </header>
+
+        <!-- Section Hero -->
+        <section class="hero-section">
+            <div class="hero-content">
+                <div class="hero-socials">
+                    <a href="https://instagram.com/kyzn9_" target="_blank" class="hero-social-badge">📸 KYZN9_</a>
+                    <a href="https://discord.com" target="_blank" class="hero-social-badge">💬 F9UM</a>
+                </div>
+                <h1>Intelligence & OSINT Global Scale.</h1>
+                <p>Plateforme de croisement de données ultra-rapide dédiée aux analystes et équipes d'investigation. Interrogez plus de 11 milliards d'enregistrements indexés en moins de 100 millisecondes pour <span class="typed-text" id="typewriter"></span></p>
+            </div>
+
+            <!-- Widget Interactif -->
+            <div class="interactive-card">
+                <div class="widget-tabs">
+                    <button class="tab-btn active" onclick="switchTab('logs', event)">Live Stream</button>
+                    <button class="tab-btn" onclick="switchTab('stats', event)">Performances</button>
+                </div>
+
+                <div id="tab-logs" class="terminal-screen">
+                    <div class="terminal-line"><span class="terminal-prompt">root@f9um:~$</span> initialisation du noyau OSINT...</div>
+                    <div class="terminal-line"><span class="terminal-prompt">[OK]</span> Indexation globale : 11,102,943,233 entrées chargées.</div>
+                    <div class="terminal-line"><span class="terminal-prompt">[OK]</span> Chiffrage de bout en bout actif (AES-256).</div>
+                    <div class="terminal-line"><span class="terminal-prompt">ready@f9um:~$</span> En attente de requête entrante...</div>
+                </div>
+
+                <div class="metrics-grid">
+                    <div class="metric-box">
+                        <div class="metric-value">11.1B+</div>
+                        <div class="metric-label">Lignes indexées</div>
+                    </div>
+                    <div class="metric-box">
+                        <div class="metric-value">< 85ms</div>
+                        <div class="metric-label">Latence moyenne</div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- ACCORDÉON 2 : Naissance -->
-            <div class="accordion-item">
-                <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-title-left">📅 Naissance</span>
-                    <span class="accordion-arrow">▼</span>
-                </button>
-                <div class="accordion-content" style="max-height: 0px;">
-                    <div class="fields-grid">
-                        <div class="field-group">
-                            <label>Jour</label>
-                            <input type="text" id="jour_naissance" placeholder="Ex: 15" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Mois</label>
-                            <input type="text" id="mois_naissance" placeholder="Ex: 06" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Année</label>
-                            <input type="text" id="annee_naissance" placeholder="Ex: 1995" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Date exacte</label>
-                            <input type="text" id="date_naissance" placeholder="Ex: 1995-06-15" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Ville de naissance</label>
-                            <input type="text" id="ville_naissance" placeholder="Ex: Paris" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                    </div>
-                </div>
+        <!-- Section Moteur de Recherche Interactif (Accordéons) -->
+        <section id="searchSection" class="search-section">
+            <div class="section-header">
+                <h2>Modules d'Investigation Avancés</h2>
+                <p>Sélectionnez et développez les filtres ci-dessous pour effectuer vos recherches multicritères.</p>
             </div>
 
-            <!-- ACCORDÉON 3 : Contact -->
-            <div class="accordion-item">
-                <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-title-left">✉️ Contact</span>
-                    <span class="accordion-arrow">▼</span>
-                </button>
-                <div class="accordion-content" style="max-height: 0px;">
-                    <div class="fields-grid">
-                        <div class="field-group">
-                            <label>Adresse E-mail</label>
-                            <input type="text" id="email" placeholder="Ex: nom@exemple.com" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Téléphone</label>
-                            <input type="text" id="telephone" placeholder="Ex: 0612345678" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Adresse IP</label>
-                            <input type="text" id="adresse_ip" placeholder="Ex: 192.168.1.1" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Discord ID</label>
-                            <input type="text" id="discord_id" placeholder="Ex: 282859044593598464" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ACCORDÉON 4 : Localisation -->
-            <div class="accordion-item">
-                <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-title-left">📍 Localisation</span>
-                    <span class="accordion-arrow">▼</span>
-                </button>
-                <div class="accordion-content" style="max-height: 0px;">
-                    <div class="fields-grid">
-                        <div class="field-group">
-                            <label>Adresse</label>
-                            <input type="text" id="adresse" placeholder="Ex: 12 Rue de la Paix" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Code Postal</label>
-                            <input type="text" id="code_postal" placeholder="Ex: 91000" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                        <div class="field-group">
-                            <label>Ville</label>
-                            <input type="text" id="ville" placeholder="Ex: Paris" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ACCORDÉON 5 : Mots de passe & Adresses Mail -->
-            <div class="accordion-item">
-                <button class="accordion-header" onclick="toggleAccordion(this)">
-                    <span class="accordion-title-left">🔑 Mots de passe & Adresses Mail</span>
-                    <span class="accordion-arrow">▼</span>
-                </button>
-                <div class="accordion-content" style="max-height: 0px;">
-                    <div class="fields-grid">
-                        <div class="field-group">
-                            <label>Requête Mail / Mot de passe</label>
-                            <input type="text" id="oathnet_query" placeholder="Ex: email@domaine.com ou mot de passe" onkeypress="if(event.key === 'Enter') lancerRechercheOathnet()">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <div class="action-bar">
-            <div class="action-buttons-group">
-                <button class="btn-search" onclick="lancerRechercheMulticritere()">Lancer la recherche</button>
-                <button class="btn-search btn-oathnet" onclick="lancerRechercheOathnet()">MOTS DE PASSE ADRESSE MAIL</button>
-            </div>
-            <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">Modules connectés</span>
-        </div>
-
-        <div id="resultsArea"></div>
-    </section>
-</div>
-
-<script>
-    function toggleAccordion(button) {
-        const item = button.parentElement;
-        const content = item.querySelector('.accordion-content');
-        
-        item.classList.toggle('active');
-        
-        if (item.classList.contains('active')) {
-            content.style.maxHeight = content.scrollHeight + "px";
-        } else {
-            content.style.maxHeight = "0px";
-        }
-    }
-
-    const words = ["les enquêteurs.", "les analystes.", "la recherche de données.", "la cybersécurité."];
-    let wordIndex = 0;
-    let charIndex = 0;
-    let isDeleting = false;
-    const typewriterElement = document.getElementById("typewriter");
-
-    function typeEffect() {
-        const currentWord = words[wordIndex];
-        if (isDeleting) {
-            typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
-            charIndex--;
-        } else {
-            typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
-            charIndex++;
-        }
-
-        let typeSpeed = isDeleting ? 40 : 90;
-        if (!isDeleting && charIndex === currentWord.length) {
-            typeSpeed = 2200;
-            isDeleting = true;
-        } else if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            wordIndex = (wordIndex + 1) % words.length;
-            typeSpeed = 400;
-        }
-        setTimeout(typeEffect, typeSpeed);
-    }
-    document.addEventListener("DOMContentLoaded", typeEffect);
-
-    function copierResultat(elementId, btnElement) {
-        const textContainer = document.getElementById(elementId);
-        if (!textContainer) return;
-        
-        const textToCopy = textContainer.innerText + "\nBY F9UM-SERVICES";
-        
-        navigator.clipboard.writeText(textToCopy).then(() => {
-            const originalText = btnElement.innerText;
-            btnElement.innerText = "Copié ! ✅";
-            btnElement.style.background = "var(--neon-green)";
-            setTimeout(() => {
-                btnElement.innerText = originalText;
-                btnElement.style.background = "";
-            }, 2000);
-        }).catch(err => {
-            console.error('Erreur lors de la copie :', err);
-        });
-    }
-
-    async function lancerRechercheMulticritere() {
-        const area = document.getElementById('resultsArea');
-
-        const payloadData = {
-            nom_famille: document.getElementById('nom_famille').value.trim(),
-            prenom: document.getElementById('prenom').value.trim(),
-            nom_naissance: document.getElementById('nom_naissance').value.trim(),
-            nom_affiche: document.getElementById('nom_affiche').value.trim(),
-            genre: document.getElementById('genre').value.trim(),
-            nom_utilisateur: document.getElementById('nom_utilisateur').value.trim(),
-            jour_naissance: document.getElementById('jour_naissance').value.trim(),
-            mois_naissance: document.getElementById('mois_naissance').value.trim(),
-            annee_naissance: document.getElementById('annee_naissance').value.trim(),
-            date_naissance: document.getElementById('date_naissance').value.trim(),
-            ville_naissance: document.getElementById('ville_naissance').value.trim(),
-            email: document.getElementById('email').value.trim(),
-            telephone: document.getElementById('telephone').value.trim(),
-            adresse_ip: document.getElementById('adresse_ip').value.trim(),
-            discord_id: document.getElementById('discord_id').value.trim(),
-            adresse: document.getElementById('adresse').value.trim(),
-            code_postal: document.getElementById('code_postal').value.trim(),
-            ville: document.getElementById('ville').value.trim(),
-            flexible: true,
-            per_page: 15
-        };
-
-        const activeFilters = Object.fromEntries(Object.entries(payloadData).filter(([_, v]) => v !== "" && v !== true));
-
-        if (Object.keys(activeFilters).length === 0) {
-            area.innerHTML = `
-                <div class="result-card">
-                    <p style="color: #ef4444; font-family: var(--font-mono); font-size: 0.9rem;">⚠️ Veuillez remplir au moins un critère de recherche dans les menus.</p>
-                </div>`;
-            return;
-        }
-
-        area.innerHTML = `
-            <div class="spinner-container">
-                <div class="spinner"></div>
-                <p style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-mono);">
-                    Connexion au serveur F9UM...
-                </p>
-            </div>
-        `;
-
-        try {
-            const RENDER_URL = "https://f9um-services.onrender.com"; 
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 45000);
-
-            const queryParams = new URLSearchParams(Object.entries(payloadData).filter(([_, v]) => v !== "" && v !== false));
-
-            const response = await fetch(`${RENDER_URL}/search?${queryParams.toString()}`, {
-                method: 'GET',
-                signal: controller.signal,
-                headers: { 'Accept': 'application/json' }
-            });
-            
-            clearTimeout(timeoutId);
-
-            if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
-
-            const data = await response.json();
-
-            if (data.status === 'success' && data.results && data.results.length > 0) {
-                let htmlResults = '';
+            <div class="search-builder">
                 
-                data.results.forEach((item, index) => {
-                    const uniqueTextId = `result_content_${index}`;
-                    htmlResults += `
-                        <div class="result-card">
-                            <div id="${uniqueTextId}" style="font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-line; margin-bottom: 15px;">${item.data}</div>
-                            <button class="btn-search" style="padding: 8px 16px; font-size: 11px;" onclick="copierResultat('${uniqueTextId}', this)">📋 Copier ce résultat</button>
+                <!-- ACCORDÉON 1 : Identité -->
+                <div class="accordion-item active">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title-left">👤 Identité</span>
+                        <span class="accordion-arrow">▼</span>
+                    </button>
+                    <div class="accordion-content" style="max-height: 400px;">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <label>Nom</label>
+                                <input type="text" id="nom_famille" placeholder="Ex: Dupont" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Prénom</label>
+                                <input type="text" id="prenom" placeholder="Ex: Jean" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Nom de naissance</label>
+                                <input type="text" id="nom_naissance" placeholder="Ex: Martin" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Nom affiché</label>
+                                <input type="text" id="nom_affiche" placeholder="Ex: Jean Dupont" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Genre</label>
+                                <input type="text" id="genre" placeholder="Ex: M / F" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Nom d'utilisateur</label>
+                                <input type="text" id="nom_utilisateur" placeholder="Ex: Pseudo123" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
                         </div>
-                    `;
-                });
-                area.innerHTML = htmlResults;
-            } else {
-                area.innerHTML = `<div class="result-card"><p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">Aucun résultat trouvé.</p></div>`;
-            }
-        } catch (error) {
-            area.innerHTML = `<div class="result-card"><p style="font-family: var(--font-mono); font-size: 0.85rem; color: #ef4444;">Erreur de connexion : ${error.message}</p></div>`;
-        }
-    }
+                    </div>
+                </div>
 
-    async function lancerRechercheOathnet() {
-        // Logique Oathnet
-    }
-</script>
+                <!-- ACCORDÉON 2 : Naissance -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title-left">📅 Naissance</span>
+                        <span class="accordion-arrow">▼</span>
+                    </button>
+                    <div class="accordion-content" style="max-height: 0px;">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <label>Jour</label>
+                                <input type="text" id="jour_naissance" placeholder="Ex: 15" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Mois</label>
+                                <input type="text" id="mois_naissance" placeholder="Ex: 06" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Année</label>
+                                <input type="text" id="annee_naissance" placeholder="Ex: 1995" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Date exacte</label>
+                                <input type="text" id="date_naissance" placeholder="Ex: 1995-06-15" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Ville de naissance</label>
+                                <input type="text" id="ville_naissance" placeholder="Ex: Paris" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCORDÉON 3 : Contact -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title-left">✉️ Contact</span>
+                        <span class="accordion-arrow">▼</span>
+                    </button>
+                    <div class="accordion-content" style="max-height: 0px;">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <label>Adresse E-mail</label>
+                                <input type="text" id="email" placeholder="Ex: nom@exemple.com" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Téléphone</label>
+                                <input type="text" id="telephone" placeholder="Ex: 0612345678" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Adresse IP</label>
+                                <input type="text" id="adresse_ip" placeholder="Ex: 192.168.1.1" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Discord ID</label>
+                                <input type="text" id="discord_id" placeholder="Ex: 282859044593598464" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCORDÉON 4 : Localisation -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title-left">📍 Localisation</span>
+                        <span class="accordion-arrow">▼</span>
+                    </button>
+                    <div class="accordion-content" style="max-height: 0px;">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <label>Adresse</label>
+                                <input type="text" id="adresse" placeholder="Ex: 12 Rue de la Paix" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Code Postal</label>
+                                <input type="text" id="code_postal" placeholder="Ex: 91000" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                            <div class="field-group">
+                                <label>Ville</label>
+                                <input type="text" id="ville" placeholder="Ex: Paris" onkeypress="if(event.key === 'Enter') lancerRechercheMulticritere()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ACCORDÉON 5 : Mots de passe & Adresses Mail -->
+                <div class="accordion-item">
+                    <button class="accordion-header" onclick="toggleAccordion(this)">
+                        <span class="accordion-title-left">🔑 Mots de passe & Adresses Mail</span>
+                        <span class="accordion-arrow">▼</span>
+                    </button>
+                    <div class="accordion-content" style="max-height: 0px;">
+                        <div class="fields-grid">
+                            <div class="field-group">
+                                <label>Requête Mail / Mot de passe</label>
+                                <input type="text" id="oathnet_query" placeholder="Ex: email@domaine.com ou mot de passe" onkeypress="if(event.key === 'Enter') lancerRechercheOathnet()">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="action-bar">
+                <div class="action-buttons-group">
+                    <button class="btn-search" onclick="lancerRechercheMulticritere()">🔍 Lancer la recherche</button>
+                    <button class="btn-search btn-oathnet" onclick="lancerRechercheOathnet()">🔑 MOTS DE PASSE ADRESSE MAIL</button>
+                </div>
+                <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);">Modules sécurisés connectés</span>
+            </div>
+
+            <div id="resultsArea"></div>
+        </section>
+
+        <!-- Section FAQ -->
+        <section class="faq-section">
+            <div class="section-header">
+                <h2>Questions Fréquentes</h2>
+                <p>Tout ce que vous devez savoir sur le fonctionnement de la plateforme.</p>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">Comment accéder aux services de recherche ? <span>+</span></div>
+                <div class="faq-answer">L'accès s'effectue directement via notre interface Web sécurisée ou par le biais de nos passerelles dédiées. Rejoignez notre communauté pour obtenir vos accès.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">Quels types de données sont indexés ? <span>+</span></div>
+                <div class="faq-answer">La base regroupe plus de 11 milliards d'enregistrements provenant de fuites publiques, de répertoires institutionnels et de bases ouvertes d'OSINT global.</div>
+            </div>
+
+            <div class="faq-item" onclick="toggleFaq(this)">
+                <div class="faq-question">Une version sur le réseau Tor est-elle prévue ? <span>+</span></div>
+                <div class="faq-answer">Oui, le déploiement de notre service en oignon (.onion) est actuellement en cours de finalisation pour un anonymat renforcé.</div>
+            </div>
+        </section>
+
+        <!-- Pied de page -->
+        <footer>
+            <div>© 2026 F9UM SERVICES. Tous droits réservés.</div>
+            <div class="footer-links">
+                <a href="#">Confidentialité</a>
+                <a href="#">Conditions</a>
+                <a href="#">API Docs</a>
+            </div>
+            <div class="tor-notice">⏳ Bientôt sur Tor (.onion)</div>
+        </footer>
+
+    </div>
+
+    <!-- Script JavaScript interactif et animation Canvas -->
+    <script>
+        // Animation du canvas de fond (Particules connectées)
+        const canvas = document.getElementById('bg-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 40; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.5,
+                vy: (Math.random() - 0.5) * 0.5,
+                radius: Math.random() * 1.5 + 0.5
+            });
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+            ctx.strokeStyle = 'rgba(59, 130, 246, 0.05)';
+
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                for (let j = index + 1; j < particles.length; j++) {
+                    let p2 = particles[j];
+                    let dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animateParticles);
+        }
+        animateParticles();
+
+        // Gestion des onglets du widget terminal
+        function switchTab(tab, event) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            
+            const screen = document.getElementById('tab-logs');
+            if (tab === 'logs') {
+                screen.innerHTML = `
+                    <div class="terminal-line"><span class="terminal-prompt">root@f9um:~$</span> initialisation du noyau OSINT...</div>
+                    <div class="terminal-line"><span class="terminal-prompt">[OK]</span> Indexation globale : 11,102,943,233 entrées chargées.</div>
+                    <div class="terminal-line"><span class="terminal-prompt">[OK]</span> Chiffrage de bout en bout actif (AES-256).</div>
+                    <div class="terminal-line"><span class="terminal-prompt">ready@f9um:~$</span> En attente de requête entrante...</div>
+                `;
+            } else {
+                screen.innerHTML = `
+                    <div class="terminal-line"><span class="terminal-prompt">sys@stats:~$</span> CPU Usage: 14% (Cluster US-West)</div>
+                    <div class="terminal-line"><span class="terminal-prompt">sys@stats:~$</span> Memory Allocated: 32.4 GB / 128 GB</div>
+                    <div class="terminal-line"><span class="terminal-prompt">sys@stats:~$</span> Active Queries / sec: 1,420</div>
+                    <div class="terminal-line"><span class="terminal-prompt">sys@stats:~$</span> Uptime: 99.99%</div>
+                `;
+            }
+        }
+
+        // Effet Machine à écrire (Typewriter)
+        const words = ["les enquêteurs.", "les analystes.", "la recherche de données.", "la cybersécurité."];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typewriterElement = document.getElementById("typewriter");
+
+        function typeEffect() {
+            if (!typewriterElement) return;
+            const currentWord = words[wordIndex];
+            if (isDeleting) {
+                typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let typeSpeed = isDeleting ? 40 : 90;
+            if (!isDeleting && charIndex === currentWord.length) {
+                typeSpeed = 2200;
+                isDeleting = true;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                typeSpeed = 400;
+            }
+            setTimeout(typeEffect, typeSpeed);
+        }
+        document.addEventListener("DOMContentLoaded", typeEffect);
+
+        // Gestion des accordéons de recherche
+        function toggleAccordion(button) {
+            const item = button.parentElement;
+            const content = item.querySelector('.accordion-content');
+            
+            item.classList.toggle('active');
+            
+            if (item.classList.contains('active')) {
+                content.style.maxHeight = content.scrollHeight + "px";
+            } else {
+                content.style.maxHeight = "0px";
+            }
+        }
+
+        // Accordéon FAQ
+        function toggleFaq(element) {
+            element.classList.toggle('open');
+            const indicator = element.querySelector('.faq-question span');
+            indicator.textContent = element.classList.contains('open') ? '-' : '+';
+        }
+
+        // Fonction pour copier les résultats
+        function copierResultat(elementId, btnElement) {
+            const textContainer = document.getElementById(elementId);
+            if (!textContainer) return;
+            
+            const textToCopy = textContainer.innerText + "\nBY F9UM-SERVICES";
+            
+            navigator.clipboard.writeText(textToCopy).then(() => {
+                const originalText = btnElement.innerText;
+                btnElement.innerText = "Copié ! ✅";
+                btnElement.style.background = "var(--success)";
+                setTimeout(() => {
+                    btnElement.innerText = originalText;
+                    btnElement.style.background = "";
+                }, 2000);
+            }).catch(err => {
+                console.error('Erreur lors de la copie :', err);
+            });
+        }
+
+        // Requête API Multicritère
+        async function lancerRechercheMulticritere() {
+            const area = document.getElementById('resultsArea');
+
+            const payloadData = {
+                nom_famille: document.getElementById('nom_famille').value.trim(),
+                prenom: document.getElementById('prenom').value.trim(),
+                nom_naissance: document.getElementById('nom_naissance').value.trim(),
+                nom_affiche: document.getElementById('nom_affiche').value.trim(),
+                genre: document.getElementById('genre').value.trim(),
+                nom_utilisateur: document.getElementById('nom_utilisateur').value.trim(),
+                jour_naissance: document.getElementById('jour_naissance').value.trim(),
+                mois_naissance: document.getElementById('mois_naissance').value.trim(),
+                annee_naissance: document.getElementById('annee_naissance').value.trim(),
+                date_naissance: document.getElementById('date_naissance').value.trim(),
+                ville_naissance: document.getElementById('ville_naissance').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                telephone: document.getElementById('telephone').value.trim(),
+                adresse_ip: document.getElementById('adresse_ip').value.trim(),
+                discord_id: document.getElementById('discord_id').value.trim(),
+                adresse: document.getElementById('adresse').value.trim(),
+                code_postal: document.getElementById('code_postal').value.trim(),
+                ville: document.getElementById('ville').value.trim(),
+                flexible: true,
+                per_page: 15
+            };
+
+            const activeFilters = Object.fromEntries(Object.entries(payloadData).filter(([_, v]) => v !== "" && v !== true));
+
+            if (Object.keys(activeFilters).length === 0) {
+                area.innerHTML = `
+                    <div class="result-card">
+                        <p style="color: #ef4444; font-family: var(--font-mono); font-size: 0.9rem;">⚠️ Veuillez remplir au moins un critère de recherche dans les menus.</p>
+                    </div>`;
+                return;
+            }
+
+            area.innerHTML = `
+                <div class="spinner-container">
+                    <div class="spinner"></div>
+                    <p style="font-size: 0.85rem; color: var(--text-muted); font-family: var(--font-mono);">
+                        Connexion au serveur F9UM...
+                    </p>
+                </div>
+            `;
+
+            try {
+                const RENDER_URL = "https://f9um-services.onrender.com"; 
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+                const queryParams = new URLSearchParams(Object.entries(payloadData).filter(([_, v]) => v !== "" && v !== false));
+
+                const response = await fetch(`${RENDER_URL}/search?${queryParams.toString()}`, {
+                    method: 'GET',
+                    signal: controller.signal,
+                    headers: { 'Accept': 'application/json' }
+                });
+                
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error(`Erreur serveur : ${response.status}`);
+
+                const data = await response.json();
+
+                if (data.status === 'success' && data.results && data.results.length > 0) {
+                    let htmlResults = '';
+                    
+                    data.results.forEach((item, index) => {
+                        const uniqueTextId = `result_content_${index}`;
+                        htmlResults += `
+                            <div class="result-card">
+                                <div id="${uniqueTextId}" style="font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-line; margin-bottom: 15px;">${item.data}</div>
+                                <button class="btn-search" style="padding: 8px 16px; font-size: 11px;" onclick="copierResultat('${uniqueTextId}', this)">📋 Copier ce résultat</button>
+                            </div>
+                        `;
+                    });
+                    area.innerHTML = htmlResults;
+                } else {
+                    area.innerHTML = `<div class="result-card"><p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">Aucun résultat trouvé.</p></div>`;
+                }
+            } catch (error) {
+                area.innerHTML = `<div class="result-card"><p style="font-family: var(--font-mono); font-size: 0.85rem; color: #ef4444;">Erreur de connexion : ${error.message}</p></div>`;
+            }
+        }
+
+        async function lancerRechercheOathnet() {
+            // Logique Oathnet optionnelle
+        }
+    </script>
 </body>
 </html>
