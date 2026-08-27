@@ -1168,5 +1168,33 @@
             // Logique Oathnet optionnelle
         }
     </script>
+    <script>
+    function measureLatency() {
+        const startTime = performance.now();
+        
+        // On fait une requête légère sur la page elle-même pour mesurer le temps de réponse
+        fetch(window.location.href, { method: 'HEAD', cache: 'no-store' })
+            .then(() => {
+                const endTime = performance.now();
+                const latency = Math.round(endTime - startTime);
+                
+                // On va chercher l'élément HTML qui affiche la latence et on met à jour
+                const latencyElement = document.querySelector('.latency-value'); // Remplace par ton sélecteur exact
+                if (latencyElement) {
+                    latencyElement.textContent = `< ${latency}ms`;
+                }
+            })
+            .catch(() => {
+                // En cas de petit souci réseau
+                console.log("Erreur de mesure de latence");
+            });
+    }
+
+    // Mesurer au chargement de la page, puis toutes les 5 secondes pour que ça bouge
+    window.addEventListener('load', () => {
+        measureLatency();
+        setInterval(measureLatency, 5000);
+    });
+</script>
 </body>
 </html>
