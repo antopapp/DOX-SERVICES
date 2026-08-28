@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
+head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>F9UM SERVICES // OSINT Platform & Global Intelligence </title>
@@ -153,6 +151,19 @@
             flex-wrap: wrap;
         }
 
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: #34d399;
+        }
+
         .wallet-badge {
             background: rgba(139, 92, 246, 0.1);
             border: 1px solid rgba(139, 92, 246, 0.3);
@@ -163,158 +174,18 @@
             font-size: 12px;
         }
 
-        /* --- CARROUSEL INFINI DE SOURCES (DESIGN UNIQUE DUAL-BAND) --- */
-        .sources-marquee-section {
-            width: 100vw;
-            position: relative;
-            left: 50%;
-            right: 50%;
-            margin-left: -50vw;
-            margin-right: -50vw;
-            padding: 30px 0 45px 0;
-            background: linear-gradient(180deg, rgba(2, 4, 10, 0.4) 0%, rgba(10, 15, 29, 0.7) 50%, rgba(2, 4, 10, 0.4) 100%);
-            border-top: 1px solid rgba(59, 130, 246, 0.15);
-            border-bottom: 1px solid rgba(59, 130, 246, 0.15);
-            backdrop-filter: blur(12px);
-            overflow: hidden;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .sources-title-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 22px;
-        }
-
-        .sources-title-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 10px var(--accent-glow);
-            animation: pulseDot 2s infinite ease-in-out;
-        }
-
-        @keyframes pulseDot {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.4); opacity: 1; box-shadow: 0 0 15px var(--accent); }
-        }
-
-        .sources-title {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            letter-spacing: 3px;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            font-weight: 600;
-        }
-
-        .marquee-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            width: 100%;
-        }
-
-        .marquee {
-            display: flex;
-            width: 100%;
-            overflow: hidden;
-            user-select: none;
-            mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
-            -webkit-mask-image: linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%);
-        }
-
-        .marquee-track {
-            display: flex;
-            gap: 16px;
-            width: max-content;
-            will-change: transform;
-        }
-
-        /* Ligne du haut : Gauche -> Droite */
-        .marquee-track.top-row {
-            animation: scrollLeftToRight 38s linear infinite;
-        }
-
-        /* Ligne du bas : Droite -> Gauche */
-        .marquee-track.bottom-row {
-            animation: scrollRightToLeft 38s linear infinite;
-        }
-
-        .marquee-wrapper:hover .marquee-track {
-            animation-play-state: paused;
-        }
-
-        .source-pill {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: linear-gradient(135deg, rgba(13, 20, 38, 0.8), rgba(2, 6, 23, 0.85));
-            border: 1px solid var(--border-color);
-            padding: 10px 18px;
-            border-radius: 12px;
-            color: var(--text-main);
-            font-family: var(--font-mono);
-            font-size: 12px;
-            white-space: nowrap;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Effet de scan au survol */
-        .source-pill::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.15), transparent);
-            transition: 0.5s;
-        }
-
-        .source-pill:hover::before {
-            left: 100%;
-        }
-
-        .source-pill:hover {
-            border-color: var(--border-hover);
-            background: linear-gradient(135deg, rgba(30, 58, 138, 0.25), rgba(13, 20, 38, 0.9));
-            box-shadow: 0 6px 25px var(--primary-glow);
-            transform: translateY(-2px);
-            color: #ffffff;
-        }
-
-        .source-indicator {
-            width: 6px;
-            height: 6px;
+        .pulse-dot {
+            width: 7px;
+            height: 7px;
             background-color: var(--success);
             border-radius: 50%;
             box-shadow: 0 0 8px var(--success);
+            animation: pulse 2s infinite;
         }
 
-        @keyframes scrollLeftToRight {
-            from {
-                transform: translateX(-50%);
-            }
-            to {
-                transform: translateX(0%);
-            }
-        }
-
-        @keyframes scrollRightToLeft {
-            from {
-                transform: translateX(0%);
-            }
-            to {
-                transform: translateX(-50%);
-            }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.6); opacity: 0.4; }
         }
 
         /* Section Hero principale */
@@ -661,6 +532,11 @@
             box-shadow: 0 15px 35px rgba(59, 130, 246, 0.5);
         }
 
+        button.btn-oathnet {
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            box-shadow: 0 10px 25px var(--accent-glow);
+        }
+
         #resultsArea {
             width: 100%;
             display: flex;
@@ -808,113 +684,6 @@
             </div>
         </header>
 
-        <!-- Section Carrousel Infini Dual-Band Unique -->
-        <section class="sources-marquee-section">
-            <div class="sources-title-container">
-                <div class="sources-title-dot"></div>
-                <div class="sources-title">Flux Global Indexé • Plus de 600 sources actives</div>
-                <div class="sources-title-dot"></div>
-            </div>
-            
-            <div class="marquee-wrapper">
-                <!-- Ligne du haut : Gauche -> Droite -->
-                <div class="marquee">
-                    <div class="marquee-track top-row">
-                        <!-- Série 1 -->
-                        <div class="source-pill"><div class="source-indicator"></div>Yahoo</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Deezer</div>
-                        <div class="source-pill"><div class="source-indicator"></div>OVH</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Chess.com</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Disqus</div>
-                        <div class="source-pill"><div class="source-indicator"></div>000Webhost</div>
-                        <div class="source-pill"><div class="source-indicator"></div>FiveM</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Disney+</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Amazon</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Avast</div>
-                        <div class="source-pill"><div class="source-indicator"></div>FACEIT</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Mektoube</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Shadow</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Le Slip Français</div>
-                        <div class="source-pill"><div class="source-indicator"></div>ColisPrivé</div>
-                        <div class="source-pill"><div class="source-indicator"></div>BDV.FR</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Coriolis</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Assurance Retraite</div>
-                        <div class="source-pill"><div class="source-indicator"></div>FFNatation</div>
-                        <div class="source-pill"><div class="source-indicator"></div>FFBasket</div>
-                        <!-- Série 2 (duplication pour boucle fluide) -->
-                        <div class="source-pill"><div class="source-indicator"></div>Yahoo</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Deezer</div>
-                        <div class="source-pill"><div class="source-indicator"></div>OVH</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Chess.com</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Disqus</div>
-                        <div class="source-pill"><div class="source-indicator"></div>000Webhost</div>
-                        <div class="source-pill"><div class="source-indicator"></div>FiveM</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Disney+</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Amazon</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Avast</div>
-                        <div class="source-pill"><div class="source-indicator"></div>FACEIT</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Mektoube</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Shadow</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Le Slip Français</div>
-                        <div class="source-pill"><div class="source-indicator"></div>ColisPrivé</div>
-                        <div class="source-pill"><div class="source-indicator"></div>BDV.FR</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Coriolis</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Assurance Retraite</div>
-                        <div class="source-pill"><div class="source-indicator"></div>FFNatation</div>
-                        <div class="source-pill"><div class="source-indicator"></div>FFBasket</div>
-                    </div>
-                </div>
-
-                <!-- Ligne du bas : Droite -> Gauche -->
-                <div class="marquee">
-                    <div class="marquee-track bottom-row">
-                        <!-- Série 1 -->
-                        <div class="source-pill"><div class="source-indicator"></div>Steam</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Epic Games</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Riot Games</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Spotify</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Netflix</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Twitter / X</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Telegram DB</div>
-                        <div class="source-pill"><div class="source-indicator"></div>GitHub</div>
-                        <div class="source-pill"><div class="source-indicator"></div>LinkedIn</div>
-                        <div class="source-pill"><div class="source-indicator"></div>PayPal</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Binance</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Kraken</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Orange</div>
-                        <div class="source-pill"><div class="source-indicator"></div>SFR</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Bouygues</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Free Mobile</div>
-                        <div class="source-pill"><div class="source-indicator"></div>La Poste</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Ameli</div>
-                        <div class="source-pill"><div class="source-indicator"></div>CAF</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Pôle Emploi</div>
-                        <!-- Série 2 (duplication pour boucle fluide) -->
-                        <div class="source-pill"><div class="source-indicator"></div>Steam</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Epic Games</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Riot Games</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Spotify</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Netflix</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Twitter / X</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Telegram DB</div>
-                        <div class="source-pill"><div class="source-indicator"></div>GitHub</div>
-                        <div class="source-pill"><div class="source-indicator"></div>LinkedIn</div>
-                        <div class="source-pill"><div class="source-indicator"></div>PayPal</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Binance</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Kraken</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Orange</div>
-                        <div class="source-pill"><div class="source-indicator"></div>SFR</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Bouygues</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Free Mobile</div>
-                        <div class="source-pill"><div class="source-indicator"></div>La Poste</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Ameli</div>
-                        <div class="source-pill"><div class="source-indicator"></div>CAF</div>
-                        <div class="source-pill"><div class="source-indicator"></div>Pôle Emploi</div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- Section Hero -->
         <section class="hero-section">
             <div class="hero-content">
@@ -924,7 +693,7 @@
                         <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                         KYZN9_
                     </a>
-                    <!-- Discord -->
+                    <!-- Discord avec Logo Officiel -->
                     <a href="https://discord.com" target="_blank" class="hero-social-badge">
                         <svg viewBox="0 0 24 24"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994.021-.041.001-.09-.041-.106a13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.028zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
                         F9UM
@@ -954,9 +723,9 @@
                         <div class="metric-label">Lignes indexées</div>
                     </div>
                     <div class="metric-box">
-                        <div class="metric-value latency-value">&lt; 85ms</div>
-                        <div class="metric-label">Latence moyenne</div>
-                    </div>
+    <div class="metric-value latency-value">&lt; 85ms</div>
+    <div class="metric-label">Latence moyenne</div>
+</div>
                 </div>
             </div>
         </section>
@@ -1111,6 +880,7 @@
             <div class="action-bar">
                 <div class="action-buttons-group">
                     <button class="btn-search" onclick="lancerRechercheMulticritere()">🔍 Lancer la recherche</button>
+                    <button class="btn-search btn-oathnet" onclick="lancerRechercheOathnet()">🔑 MOTS DE PASSE ADRESSE MAIL</button>
                 </div>
                 <span style="font-size: 12px; color: var(--text-muted); font-family: var(--font-mono);">Modules sécurisés connectés</span>
             </div>
@@ -1369,7 +1139,7 @@
 
                 const data = await response.json();
 
-                if (data.status === 'success' && data.results && data.results.token && data.results.length > 0) {
+                if (data.status === 'success' && data.results && data.results.length > 0) {
                     let htmlResults = '';
                     
                     data.results.forEach((item, index) => {
@@ -1397,20 +1167,26 @@
     <script>
     function measureLatency() {
         const startTime = performance.now();
+        
+        // On fait une requête légère sur la page elle-même pour mesurer le temps de réponse
         fetch(window.location.href, { method: 'HEAD', cache: 'no-store' })
             .then(() => {
                 const endTime = performance.now();
                 const latency = Math.round(endTime - startTime);
-                const latencyElement = document.querySelector('.latency-value');
+                
+                // On va chercher l'élément HTML qui affiche la latence et on met à jour
+                const latencyElement = document.querySelector('.latency-value'); // Remplace par ton sélecteur exact
                 if (latencyElement) {
                     latencyElement.textContent = `< ${latency}ms`;
                 }
             })
             .catch(() => {
+                // En cas de petit souci réseau
                 console.log("Erreur de mesure de latence");
             });
     }
 
+    // Mesurer au chargement de la page, puis toutes les 5 secondes pour que ça bouge
     window.addEventListener('load', () => {
         measureLatency();
         setInterval(measureLatency, 5000);
