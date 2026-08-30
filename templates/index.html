@@ -1320,36 +1320,34 @@
             document.getElementById('resultsArea').innerHTML = '';
         }
 
-        // --- 7. FORMATTAGE ET RÉORGANISATION DES DONNÉES ---
-        function formaterEtReordonnerDonnees(item) {
-            // Extrait ou structure les données dans l'ordre demandé :
-            // Prénom, Nom, Date de naissance, Ville, Adresse, Genre, Numéro de tel, Adresse mail
-            
-            // Si l'élément provient d'un parsing brut ou d'une chaîne, on peut extraire ou formater:
-            let rawData = item.data || "";
+       // --- 7. FORMATTAGE ET RÉORGANISATION DES DONNÉES ---
+function formaterEtReordonnerDonnees(item) {
+    let rawData = item.data || "";
 
-            // Exemple de reconstruction textuelle propre basée sur les champs standardisés
-            let prenom = item.prenom || "N/A";
-            let nom = item.nom || item.nom_famille || "N/A";
-            let dob = item.date_naissance || "N/A";
-            let ville = item.ville || "N/A";
-            let adresse = item.adresse || "N/A";
-            let genre = item.genre || "N/A";
-            let telephone = item.telephone || "N/A";
-            let email = item.email || "N/A";
+    let prenom = item.prenom;
+    let nom = item.nom || item.nom_famille;
+    let dob = item.date_naissance;
+    let ville = item.ville;
+    let adresse = item.adresse;
+    let genre = item.genre;
+    let telephone = item.telephone;
+    let email = item.email;
 
-            // Si l'objet brut contient une chaîne globale, on applique un affichage structuré formaté :
-            return `Prénom : ${prenom}
-Nom : ${nom}
-Date de naissance : ${dob}
-Ville : ${ville}
-Adresse : ${adresse}
-Genre : ${genre}
-Numéro de tel : ${telephone}
-Adresse mail : ${email}
----
+    let lignes = [];
+    if (prenom) lignes.push(`Prénom : ${prenom}`);
+    if (nom) lignes.push(`Nom : ${nom}`);
+    if (dob) lignes.push(`Date de naissance : ${dob}`);
+    if (ville) lignes.push(`Ville : ${ville}`);
+    if (adresse) lignes.push(`Adresse : ${adresse}`);
+    if (genre) lignes.push(`Genre : ${genre}`);
+    if (telephone) lignes.push(`Numéro de tel : ${telephone}`);
+    if (email) lignes.push(`Adresse mail : ${email}`);
+
+    let resultatStructure = lignes.length > 0 ? lignes.join('\n') + "\n---" : "";
+
+    return `${resultatStructure}
 [Données brutes source] : ${rawData}`;
-        }
+}
 
         // --- 8. RECHERCHE MULTICRITÈRE API AVEC COMPTEUR DE RÉSULTATS ---
         async function lancerRechercheMulticritere() {
