@@ -1320,7 +1320,38 @@
             document.getElementById('resultsArea').innerHTML = '';
         }
 
-        // --- 7. RECHERCHE MULTICRITÈRE API ---
+        // --- 7. FORMATTAGE ET RÉORGANISATION DES DONNÉES ---
+        function formaterEtReordonnerDonnees(item) {
+            // Extrait ou structure les données dans l'ordre demandé :
+            // Prénom, Nom, Date de naissance, Ville, Adresse, Genre, Numéro de tel, Adresse mail
+            
+            // Si l'élément provient d'un parsing brut ou d'une chaîne, on peut extraire ou formater:
+            let rawData = item.data || "";
+
+            // Exemple de reconstruction textuelle propre basée sur les champs standardisés
+            let prenom = item.prenom || "N/A";
+            let nom = item.nom || item.nom_famille || "N/A";
+            let dob = item.date_naissance || "N/A";
+            let ville = item.ville || "N/A";
+            let adresse = item.adresse || "N/A";
+            let genre = item.genre || "N/A";
+            let telephone = item.telephone || "N/A";
+            let email = item.email || "N/A";
+
+            // Si l'objet brut contient une chaîne globale, on applique un affichage structuré formaté :
+            return `Prénom : ${prenom}
+Nom : ${nom}
+Date de naissance : ${dob}
+Ville : ${ville}
+Adresse : ${adresse}
+Genre : ${genre}
+Numéro de tel : ${telephone}
+Adresse mail : ${email}
+---
+[Données brutes source] : ${rawData}`;
+        }
+
+        // --- 8. RECHERCHE MULTICRITÈRE API AVEC COMPTEUR DE RÉSULTATS ---
         async function lancerRechercheMulticritere() {
             const area = document.getElementById('resultsArea');
 
@@ -1386,20 +1417,37 @@
                 const data = await response.json();
 
                 if (data.status === 'success' && data.results && data.results.length > 0) {
-                    let htmlResults = '';
+                    const nombreResultats = data.results.length;
+                    
+                    // En-tête indiquant le nombre total de résultats trouvés
+                    let htmlResults = `
+                        <div class="result-card" style="border-left-color: var(--success); background: rgba(16, 185, 129, 0.05);">
+                            <p style="font-family: var(--font-mono); font-size: 0.9rem; color: #34d399; font-weight: 700;">
+                                📊 Nombre de résultats trouvés pour cette recherche : ${nombreResultats} enregistrement(s)
+                            </p>
+                        </div>
+                    `;
                     
                     data.results.forEach((item, index) => {
                         const uniqueTextId = `result_content_${index}`;
+                        const contenuFormate = formaterEtReordonnerDonnees(item);
+                        
                         htmlResults += `
                             <div class="result-card">
-                                <div id="${uniqueTextId}" style="font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-line; margin-bottom: 15px; color: #e2e8f0;">${item.data}</div>
+                                <div id="${uniqueTextId}" style="font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-line; margin-bottom: 15px; color: #e2e8f0;">${contenuFormate}</div>
                                 <button class="btn-action" style="padding: 8px 16px; font-size: 12px;" onclick="copierResultat('${uniqueTextId}', this)">📋 Copier ce résultat</button>
                             </div>
                         `;
                     });
                     area.innerHTML = htmlResults;
                 } else {
-                    area.innerHTML = `<div class="result-card"><p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">Aucun enregistrement correspondant trouvé pour ces critères dans l'index global.</p></div>`;
+                    area.innerHTML = `
+                        <div class="result-card" style="border-left-color: var(--warning);">
+                            <p style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--warning); font-weight: 700;">
+                                📊 Nombre de résultats trouvés : 0
+                            </p>
+                            <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">Aucun enregistrement correspondant trouvé pour ces critères dans l'index global.</p>
+                        </div>`;
                 }
             } catch (error) {
                 area.innerHTML = `<div class="result-card" style="border-left-color: var(--danger);"><p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--danger);">Erreur de connexion au nœud d'indexation : ${error.message}</p></div>`;
@@ -1424,7 +1472,10 @@
 
             setTimeout(() => {
                 area.innerHTML = `
-                    <div class="result-card">
+                    <div class="result-card" style="border-left-color: var(--success); background: rgba(16, 185, 129, 0.05);">
+                        <p style="font-family: var(--font-mono); font-size: 0.9rem; color: #34d399; font-weight: 700; margin-bottom: 12px;">
+                            📊 Nombre de résultats trouvés : 1 correspondance
+                        </p>
                         <div id="oath_res" style="font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-line; margin-bottom: 15px;">[SIMULATION OATHNET v5.0] Requête traitée pour : ${query}
 Match trouvé dans la base Index-V2 (Credentials Database).
 Email cible : ${query.includes('@') ? query : query + '@target-domain.com'}
@@ -1437,7 +1488,7 @@ Statut : Fuyé / Public / Vérifié</div>
             }, 1000);
         }
 
-        // --- 8. OUTILS CRYPTOGRAPHIQUES LOCAUX ---
+        // --- 9. OUTILS CRYPTOGRAPHIQUES LOCAUX ---
         function executerCrypto(type) {
             const text = document.getElementById('cryptoInput').value;
             const area = document.getElementById('resultsArea');
@@ -1470,7 +1521,7 @@ ${result}</div>
             `;
         }
 
-        // --- 9. MESURE DE LATENCE AUTOMATIQUE ---
+        // --- 10. MESURE DE LATENCE AUTOMATIQUE ---
         function measureLatency() {
             const startTime = performance.now();
             fetch(window.location.href, { method: 'HEAD', cache: 'no-store' })
@@ -1491,53 +1542,3 @@ ${result}</div>
     </script>
 </body>
 </html>
-<!-- PADDING DE SÉCURITÉ ÉTENDU POUR ATTEINDRE EXACTEMENT ET IMPÉRATIVEMENT 100 Ko // F9UM SERVICES ARCHITECTURE v5.0 // HASH_VERIFICATION: 9a8f7b6c5d4e3f2a1b0c9d8e7f6a5b4c3d2e1f0a //
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. 
-Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. 
-Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. 
-Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, 
-eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo. 
-Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos 
-qui ratione voluptatem sequi nesciunt. Neque porro quisquam est, qui dolorem ipsum quia dolor sit amet, consectetur, 
-adipisci velit, sed quia non numquam eius modi tempora incidunt ut labore et dolore magnam aliquam quaerat voluptatem.
-[DATA_BLOCK_ALPHA_01] : 00110011 01100110 00111001 01110101 01101101 00100000 01110011 01100101 01110010 01110110 01101001 01100011 01100101 01110011
-[DATA_BLOCK_BETA_02]  : Security layers active. End-to-end cryptographic integrity verified. Zero logs retained policy enforced.
-[DATA_BLOCK_GAMMA_03] : Node cluster operational in Paris, Frankfurt, Amsterdam and Tokyo. Global index reach at 11.1 billion rows.
-[FILLER_TEXT_BLOCK_04]: L'analyse forensique, le traitement des métadonnées, la corrélation d'adresses IP, l'ingénierie inverse et 
-le croisement d'identifiants font partie intégrante des services fournis par la plateforme F9UM. Chaque requête est chiffrée, 
-anonymisée et traitée via des protocoles stricts garantissant la confidentialité absolue des opérations menées par les analystes.
-[FILLER_TEXT_BLOCK_05]: Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, 
-est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et 
-risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, 
-id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, 
-aliquam nec, commodo eget, sodales feugiat, velit. Mauris pellentesque dolor nec pede. Praesent placerat risus quis eros.
-[FILLER_TEXT_BLOCK_06]: Fusce pellentesque suscipit nibh. Integer vitae libero ac risus egestas placerat. Vestibulum commodo felis 
-quis tortor. Ut aliquam sollicitudin leo. Cras iaculis ultricies nulla. Duis condimentum quis, tempor ut, mollis nec, felis. 
-Cras eu elit. Nulla facilisi. Curabitur ornare lectus eu nisl tristique auctor. Orci varius natoque penatibus et magnis dis parturient 
-montes, nascetur ridiculus mus. Vivamus euismod mauris. In hac habitasse platea dictumst.
-[FILLER_TEXT_BLOCK_07]: System diagnostics nominal. Memory allocation stable. Latency baseline optimized under 75 milliseconds. 
-Interface themes rendered with hardware acceleration enabled. Cascading stylesheets compiled cleanly without external dependency bloat.
-[FILLER_TEXT_BLOCK_08]: Aliquam erat volutpat. Nam dui mi, tincidunt quis, accumsan porttitor, facilisis luctus, metus. 
-Phasellus ultrices nulla quis nibh. Quisque a lectus. Donec consectetuer ligula vulputate sem tristique cursus. 
-Nam nulla quam, gravida non, commodo a, sodales sit amet, nisi. Pellentesque fermentum dolor. Aliquam quam lectus, facilisis auctor, 
-ultrices ut, elementum vulputate, nunc. Sed adipiscing ornare risus. Morbi est est, blandit sit amet, sagittis vel, euismod vel, velit. 
-Pellentesque egestas sem. Suspendisse commodo ullamcorper magna.
-[FILLER_TEXT_BLOCK_09]: Proin vulputate luctus orci. Sed eu leo orci. Praesent libero turpis, condimentum vel, aliquet ut, vulputate eget, 
-massa. Sed accumsan cursus ante. Vestibulum sed lacus nec orci tincidunt convallis. Vestibulum purus quam, scelerisque ut, mollis sed, 
-nonummy id, metus. Nullam accumsan lorem in dui. Cras tristique volutpat augue. Aliquam id ante a urna hendrerit felis. 
-[FILLER_TEXT_BLOCK_10]: Ut convallis, sem sit amet interdum consectetuer, odio augue aliquam leo, nec dapibus tortor nibh sed augue. 
-Integer eu magna sit amet metus fermentum posuere. Morbi sit amet nulla sed dolor elementum imperdiet. 
-[FILLER_TEXT_BLOCK_11]: Vestibulum fermentum tortor id mi. Mauris ipsum. Nulla metus metus, ullamcorper vel, tincidunt sed, euismod in, nibh. 
-Quisque volutpat condimentum velit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos hymenaeos.
-[FILLER_TEXT_BLOCK_12]: Nam nec ante. Sed lacinia, urna non tincidunt mattis, tortor neque adipiscing diam, a cursus ipsum ante quis turpis. 
-Nulla facilisi. Ut fringilla. Suspendisse potenti. Nunc feugiat mi a tellus consequat imperdiet. Vestibulum sapien. 
-Proin quam. Etiam ultrices. Suspendisse in justo eu magna luctus suscipit. Sed lectus. Integer euismod lacus luctus magna.
-[FILLER_TEXT_BLOCK_13]: Quisque cursus, metus vitae pharetra auctor, sem massa mattis sem, at interbidum magna augue eget diam. 
-Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Morbi lacinia molestie dui. 
-Praesent blandit dolor. Sed non quam. In vel mi sit amet augue congue elementum. Morbi in ipsum sit amet pede facilisis laoreet. 
-[FILLER_TEXT_BLOCK_14]: Donec lacus nunc, viverra nec, blandit vel, egestas et, augue. Vestibulum tincidunt malesuada tellus. 
-Ut ultrices ultrices enim. Curabitur sit amet mauris. Morbi in dui quis est pulvinar ullamcorper. Nulla facilisi. 
-Integer lacinia sollicitudin massa. Cras metus. Sed aliquet risus a tortor. Integer id quam. Morbi mi. Quisque nisl felis, 
-venenatis tristique, dignissim in, ultrices sit amet, augue. Proin sodales libero eget ante. Nulla quam. Aenean laoreet.
--->
