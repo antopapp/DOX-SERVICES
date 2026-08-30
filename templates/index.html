@@ -1321,33 +1321,33 @@
         }
 
        // --- 7. FORMATTAGE ET RÉORGANISATION DES DONNÉES ---
-function formaterEtReordonnerDonnees(item) {
-    let rawData = item.data || "";
+       function formaterEtReordonnerDonnees(item) {
+           let rawData = item.data || "";
 
-    let prenom = item.prenom;
-    let nom = item.nom || item.nom_famille;
-    let dob = item.date_naissance;
-    let ville = item.ville;
-    let adresse = item.adresse;
-    let genre = item.genre;
-    let telephone = item.telephone;
-    let email = item.email;
+           let prenom = item.prenom;
+           let nom = item.nom || item.nom_famille;
+           let dob = item.date_naissance;
+           let ville = item.ville;
+           let adresse = item.adresse;
+           let genre = item.genre;
+           let telephone = item.telephone;
+           let email = item.email;
 
-    let lignes = [];
-    if (prenom) lignes.push(`Prénom : ${prenom}`);
-    if (nom) lignes.push(`Nom : ${nom}`);
-    if (dob) lignes.push(`Date de naissance : ${dob}`);
-    if (ville) lignes.push(`Ville : ${ville}`);
-    if (adresse) lignes.push(`Adresse : ${adresse}`);
-    if (genre) lignes.push(`Genre : ${genre}`);
-    if (telephone) lignes.push(`Numéro de tel : ${telephone}`);
-    if (email) lignes.push(`Adresse mail : ${email}`);
+           let lignes = [];
+           if (prenom) lignes.push(`Prénom : ${prenom}`);
+           if (nom) lignes.push(`Nom : ${nom}`);
+           if (dob) lignes.push(`Date de naissance : ${dob}`);
+           if (ville) lignes.push(`Ville : ${ville}`);
+           if (adresse) lignes.push(`Adresse : ${adresse}`);
+           if (genre) lignes.push(`Genre : ${genre}`);
+           if (telephone) lignes.push(`Numéro de tel : ${telephone}`);
+           if (email) lignes.push(`Adresse mail : ${email}`);
 
-    let resultatStructure = lignes.length > 0 ? lignes.join('\n') + "\n---" : "";
+           let resultatStructure = lignes.length > 0 ? lignes.join('\n') + "\n---" : "";
 
-    return `${resultatStructure}
+           return `${resultatStructure}
 [Données brutes source] : ${rawData}`;
-}
+       }
 
         // --- 8. RECHERCHE MULTICRITÈRE API AVEC COMPTEUR DE RÉSULTATS ---
         async function lancerRechercheMulticritere() {
@@ -1417,7 +1417,7 @@ function formaterEtReordonnerDonnees(item) {
                 if (data.status === 'success' && data.results && data.results.length > 0) {
                     const nombreResultats = data.results.length;
                     
-                    // En-tête indiquant le nombre total de résultats trouvés
+                    // En-tête indiquant le nombre total de résultats trouvés[cite: 3]
                     let htmlResults = `
                         <div class="result-card" style="border-left-color: var(--success); background: rgba(16, 185, 129, 0.05);">
                             <p style="font-family: var(--font-mono); font-size: 0.9rem; color: #34d399; font-weight: 700;">
@@ -1442,7 +1442,7 @@ function formaterEtReordonnerDonnees(item) {
                     area.innerHTML = `
                         <div class="result-card" style="border-left-color: var(--warning);">
                             <p style="font-family: var(--font-mono); font-size: 0.9rem; color: var(--warning); font-weight: 700;">
-                                📊 Nombre de résultats trouvés : 0
+                                📊 Nombre de résultats trouvés : 0[cite: 3]
                             </p>
                             <p style="font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted); margin-top: 8px;">Aucun enregistrement correspondant trouvé pour ces critères dans l'index global.</p>
                         </div>`;
@@ -1472,7 +1472,7 @@ function formaterEtReordonnerDonnees(item) {
                 area.innerHTML = `
                     <div class="result-card" style="border-left-color: var(--success); background: rgba(16, 185, 129, 0.05);">
                         <p style="font-family: var(--font-mono); font-size: 0.9rem; color: #34d399; font-weight: 700; margin-bottom: 12px;">
-                            📊 Nombre de résultats trouvés : 1 correspondance
+                            📊 Nombre de résultats trouvés : 1 correspondance[cite: 3]
                         </p>
                         <div id="oath_res" style="font-family: var(--font-mono); font-size: 0.85rem; white-space: pre-line; margin-bottom: 15px;">[SIMULATION OATHNET v5.0] Requête traitée pour : ${query}
 Match trouvé dans la base Index-V2 (Credentials Database).
