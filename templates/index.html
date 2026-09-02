@@ -834,7 +834,7 @@
         
         <!-- En-tête -->
         <header>
-            <a href="#" class="brand">
+            <a href="https://vercel.com/kyzns-projects-af101135/dox-services" target="_blank" class="brand">
                 <div class="brand-logo">
                     <svg viewBox="0 0 24 24">
                         <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
@@ -1396,13 +1396,13 @@
             `;
 
             try {
-                const RENDER_URL = "https://f9um-services.onrender.com"; 
+                const VERCEL_URL = "https://vercel.com/kyzns-projects-af101135/dox-services"; 
                 const controller = new AbortController();
                 const timeoutId = setTimeout(() => controller.abort(), 45000);
 
                 const queryParams = new URLSearchParams(Object.entries(payloadData).filter(([_, v]) => v !== "" && v !== false));
 
-                const response = await fetch(`${RENDER_URL}/search?${queryParams.toString()}`, {
+                const response = await fetch(`${VERCEL_URL}/search?${queryParams.toString()}`, {
                     method: 'GET',
                     signal: controller.signal,
                     headers: { 'Accept': 'application/json' }
